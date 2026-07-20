@@ -20,6 +20,14 @@ func test_holy_is_strong_vs_ethereal() -> void:
 	assert_eq(CombatTypes.multiplier(CombatTypes.Damage.HOLY, CombatTypes.Armor.ETHEREAL), 1.5)
 
 
+func test_ethereal_resists_all_physical_only_necrotic_bites() -> void:
+	# The Wraith's whole identity: Pierce/Blunt/Fire all rattle through (×0.5); only Necrotic/Holy works.
+	assert_eq(CombatTypes.multiplier(CombatTypes.Damage.PIERCE, CombatTypes.Armor.ETHEREAL), 0.5)
+	assert_eq(CombatTypes.multiplier(CombatTypes.Damage.BLUNT, CombatTypes.Armor.ETHEREAL), 0.5)
+	assert_eq(CombatTypes.multiplier(CombatTypes.Damage.FIRE, CombatTypes.Armor.ETHEREAL), 0.5)
+	assert_eq(CombatTypes.multiplier(CombatTypes.Damage.HOLY, CombatTypes.Armor.ETHEREAL), 1.5)
+
+
 func test_resolve_damage_applies_multiplier() -> void:
 	# 10 blunt into bone → ×1.5 = 15
 	assert_eq(CombatTypes.resolve_damage(10.0, CombatTypes.Damage.BLUNT, CombatTypes.Armor.BONE), 15.0)

@@ -3,10 +3,15 @@ extends Node2D
 ## and wave manager, handles minion placement/upgrades via clicks, and resolves win/lose.
 ## Entered from the Hub via "Begin Run"; returns there via "Return to Crypt".
 
-const ARCHER := preload("res://scripts/minions/bone_archer.gd")
-const GOLEM := preload("res://scripts/minions/bone_mill_golem.gd")
-
 const HUB_SCENE := "res://scenes/hub/hub.tscn"
+
+## Minion id → scene script + short display name. Which are *available* in a run is decided by
+## the meta skill tree (RunModifiers.unlocked_minions); cost is read from the instance (_ready).
+const MINION_REGISTRY := {
+	"archer": {"script": preload("res://scripts/minions/bone_archer.gd"), "name": "Archer"},
+	"golem": {"script": preload("res://scripts/minions/bone_mill_golem.gd"), "name": "Golem"},
+	"wraith": {"script": preload("res://scripts/minions/bound_wraith.gd"), "name": "Wraith"},
+}
 
 const SLOT_RADIUS := 8.0
 const SLOT_CLICK_RADIUS := 12.0
@@ -34,6 +39,7 @@ var _game_over: bool = false
 ## Effects from the meta skill tree, applied at run start (GDD §7/§10).
 var _mods: RunModifiers
 var _damage_mult: float = 1.0
+var _minion_cost: Dictionary = {}   # id → cost, for available minions this run
 
 
 func _ready() -> void:
@@ -66,12 +72,30 @@ func _ready() -> void:
 	_hud.start_wave_pressed.connect(_on_start_wave)
 	_hud.return_to_hub_pressed.connect(_on_return_to_hub)
 
+	_populate_available_minions()
+
 	GameState.bone_dust_changed.connect(_on_dust_changed)
 	_on_dust_changed(GameState.bone_dust)
 	_on_life_changed(_phylactery.life, _phylactery.max_life)
 	_on_harvest_changed(0)
 	_update_wave_hud()
 	queue_redraw()
+
+
+## Offers only the minions the meta tree has unlocked (GDD §7). Reads each minion's cost from
+## a probe instance (cost is set in _ready), keeping cost authoritative — no duplicated numbers.
+func _populate_available_minions() -> void:
+	var offered := []
+	for id in _mods.unlocked_minions:
+		if not MINION_REGISTRY.has(id):
+			continue
+		var probe: Minion = MINION_REGISTRY[id]["script"].new()
+		add_child(probe)          # _ready() sets the real cost
+		var cost := probe.cost
+		probe.queue_free()
+		_minion_cost[id] = cost
+		offered.append({"id": id, "name": MINION_REGISTRY[id]["name"], "cost": cost})
+	_hud.set_minions(offered)
 
 
 # ---------------------------------------------------------------- input / placement
@@ -105,10 +129,10 @@ func _nearest_slot(world_pos: Vector2) -> int:
 
 
 func _try_place(idx: int) -> void:
-	if _selected_kind == "":
+	# Gating: only place a minion this run has actually unlocked (offered by the HUD).
+	if not _minion_cost.has(_selected_kind):
 		return
-	var script: Script = ARCHER if _selected_kind == HUD.ARCHER else GOLEM
-	var minion: Minion = script.new()
+	var minion: Minion = MINION_REGISTRY[_selected_kind]["script"].new()
 	# Subclasses set their stats (cost, damage, …) in _ready(), which fires synchronously on
 	# add_child — so cost/damage must be read and the buff applied AFTER mounting, not before.
 	add_child(minion)
@@ -214,7 +238,6 @@ func _draw() -> void:
 
 
 func _selected_affordable() -> bool:
-	if _selected_kind == "":
+	if not _minion_cost.has(_selected_kind):
 		return false
-	var cost := 50 if _selected_kind == HUD.ARCHER else 80
-	return GameState.can_afford(cost)
+	return GameState.can_afford(_minion_cost[_selected_kind])

@@ -6,6 +6,7 @@ extends GutTest
 
 const ARCHER := preload("res://scripts/minions/bone_archer.gd")
 const GOLEM := preload("res://scripts/minions/bone_mill_golem.gd")
+const WRAITH := preload("res://scripts/minions/bound_wraith.gd")
 
 
 func test_stats_are_set_by_ready_not_by_new() -> void:
@@ -31,3 +32,10 @@ func test_damage_buff_multiplies_the_ready_value() -> void:
 	add_child_autofree(g)
 	g.damage *= 1.1
 	assert_almost_eq(g.damage, 15.4, 0.001)
+
+
+func test_bound_wraith_deals_necrotic() -> void:
+	var w: Minion = WRAITH.new()
+	add_child_autofree(w)
+	assert_eq(w.cost, 70)
+	assert_eq(w.damage_type, CombatTypes.Damage.HOLY, "Bound Wraith deals Necrotic/Holy")

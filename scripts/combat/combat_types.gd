@@ -9,8 +9,11 @@ enum Damage {
 	PIERCE,   ## Bone Archer — great vs. soft, rattles through bone
 	BLUNT,    ## Bone-Mill Golem — shatters bone, mediocre vs. soft
 	FIRE,     ## censer / mage burn (post-M0)
-	HOLY,     ## necrotic/relic (post-M0)
+	HOLY,     ## necrotic / relic — the anti-ethereal slot
 }
+
+## Alias: the necromancer's own damage is "Necrotic", which shares the HOLY matrix slot.
+const NECROTIC := Damage.HOLY
 
 enum Armor {
 	UNARMORED,   ## soft flesh — skeletal dog
@@ -26,7 +29,7 @@ const MATRIX := {
 		Armor.UNARMORED: 1.5,
 		Armor.BONE: 0.5,
 		Armor.HEAVY: 0.5,
-		Armor.ETHEREAL: 1.0,
+		Armor.ETHEREAL: 0.5,   # physical rattles through a wraith — only Necrotic/Holy bites
 	},
 	Damage.BLUNT: {
 		Armor.UNARMORED: 1.0,
