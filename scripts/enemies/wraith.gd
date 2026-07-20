@@ -3,8 +3,6 @@ extends Enemy
 ## only Necrotic/Holy bites (×1.5). Forces the player to unlock the Bound Wraith — the
 ## "the tree gave me the tool I needed" moment. Debones by fading: whole → tattered → wisp.
 
-const GHOST := Color("9be7a0")
-
 
 func _ready() -> void:
 	max_hp = 60.0
