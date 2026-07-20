@@ -21,6 +21,8 @@ scripts/
             wave_manager.gd    — scripted wave spawning + enemy signal wiring
   enemies/  enemy.gd (base) + skeleton_grunt.gd, skeletal_dog.gd
   minions/  minion.gd (base) + bone_archer.gd, bone_mill_golem.gd, projectile.gd
+  meta/     skill_tree.gd      — SkillTree autoload: node data, purchase, run-modifier aggregation
+            run_modifiers.gd   — RunModifiers value object (aggregated tree effects for a run)
   ui/       hud.gd             — code-built HUD (labels, buttons, end panel)
   main/     main.gd            — M0 orchestrator (world build, placement, win/lose)
 scenes/     main/main.tscn     — entry scene (thin: just the Main node + script)
@@ -39,6 +41,10 @@ docs/                          — design + technical + player docs
   (run-end / purchase autosave hooks land in later M1 features). Path-injectable
   `save_to()`/`load_from()` keep tests off the real save. `bank_harvest(base, cleared)` applies
   the success multiplier on a clear.
+- **`SkillTree`** — data-driven meta skill tree (GDD §7/§10). Holds node definitions (`NODES`:
+  id → name/desc/cost/prereqs/effect), gates purchases via `MetaState` (`can_purchase`/`purchase`), and
+  aggregates unlocked nodes into a `RunModifiers` (unlocked minions + global buffs) that a run
+  reads at start via `build_run_modifiers()`. No UI — the Hub (M1-F3) renders it.
 
 ## Core patterns
 - **Code-driven world:** `main.gd` builds the path, phylactery, build slots, wave manager, and
@@ -61,8 +67,8 @@ phylactery damage).
 
 ## Testing entry points
 - `./run_tests.sh` runs GUT headless over `tests/unit/`.
-- Pure-logic autoloads (`CombatTypes`, `GameState`, `MetaState`) are directly unit-testable; see
-  `tests/unit/`.
+- Pure-logic autoloads (`CombatTypes`, `GameState`, `MetaState`, `SkillTree`) are directly
+  unit-testable; see `tests/unit/`.
 
 ---
 
