@@ -5,6 +5,10 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 3 (lighting re-tune)** — re-tuned the additive lighting for the smooth
+  native-res world: a soft moonlight pool under the backdrop's moon, a softer/wider phylactery
+  bleed, warmer/larger brazier pools, and brighter road-rune glimmers. Per-act accent hook and
+  vignette unchanged.
 - **M2b · Restyle, slice 2 (smooth backdrop)** — repainted the graveyard backdrop smooth/painterly
   for the native-res renderer: gradient sky + a soft glowing moon, hazy crypt-spire silhouettes, a
   smoothly-lit stone road (no more pixel cobbles), soft painted gravestones / skull-piles /
