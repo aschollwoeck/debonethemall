@@ -43,6 +43,21 @@ func test_hline_and_vline() -> void:
 	assert_almost_eq(img.get_pixel(0, 0).a, 0.0, 0.001, "untouched stays clear")
 
 
+func test_line_draws_endpoints_and_a_diagonal() -> void:
+	var img := PixelArt.canvas(8, 8)
+	PixelArt.line(img, 1, 1, 6, 6, Color.RED)
+	assert_eq(img.get_pixel(1, 1), Color.RED, "start endpoint set")
+	assert_eq(img.get_pixel(6, 6), Color.RED, "end endpoint set")
+	assert_eq(img.get_pixel(3, 3), Color.RED, "diagonal midpoint set")
+	assert_almost_eq(img.get_pixel(7, 0).a, 0.0, 0.001, "off-line pixel stays clear")
+
+
+func test_line_off_canvas_is_clipped_not_crashing() -> void:
+	var img := PixelArt.canvas(4, 4)
+	PixelArt.line(img, -3, -3, 6, 6, Color.RED)   # runs off both ends — must clip via px bounds
+	assert_eq(img.get_pixel(1, 1), Color.RED, "the in-bounds part is written")
+
+
 func test_sprite_is_nearest_upscaled_feet_at_origin() -> void:
 	var img := PixelArt.canvas(16, 24)
 	var spr := PixelArt.sprite(img, 3.0)

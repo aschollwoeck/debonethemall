@@ -66,29 +66,39 @@ func _draw() -> void:
 	super._draw()
 
 
-func _draw_body() -> void:
-	var ol := Color("100e15")
+## Fine pixel art (art-direction §6): a hunched stone grinder, bone-toothed maw, necrotic cracks.
+func _author_body() -> Image:
+	var out := Color("100e15")
 	var lo := Color("26242c")
 	var mid := Color("3c3a45")
 	var hi := Color("55535f")
 	var bone := Color("d8cdae")
 	var crack := Color("63e39a")
-	# shoulders / fists
-	draw_rect(Rect2(-11, -8, 4, 9), lo); draw_rect(Rect2(7, -8, 4, 9), mid)
-	draw_rect(Rect2(-11, 1, 4, 3), ol); draw_rect(Rect2(7, 1, 4, 3), ol)
-	# hunched stone body
-	draw_rect(Rect2(-8, -13, 16, 18), mid)
-	draw_rect(Rect2(-8, -13, 4, 18), lo)                 # shadowed left
-	draw_rect(Rect2(-8, -13, 16, 2), hi)                 # lit top edge
-	draw_rect(Rect2(-8, -13, 16, 18), ol, false, 1.0)    # outline
+	var img := PixelArt.canvas(44, 38)
+	# arms + fists
+	PixelArt.rect(img, 5, 16, 6, 12, lo); PixelArt.rect(img, 5, 25, 6, 4, out)
+	PixelArt.rect(img, 33, 16, 6, 12, mid); PixelArt.rect(img, 33, 25, 6, 4, out)
+	PixelArt.hline(img, 5, 16, 6, hi); PixelArt.hline(img, 33, 16, 6, hi)
+	# stubby feet
+	PixelArt.rect(img, 14, 33, 6, 4, lo); PixelArt.rect(img, 24, 33, 6, 4, lo)
+	PixelArt.hline(img, 14, 36, 16, out)
+	# hunched stone torso
+	PixelArt.rect(img, 11, 6, 22, 27, mid)
+	PixelArt.rect(img, 11, 6, 5, 27, lo)          # shadowed left
+	PixelArt.hline(img, 11, 6, 22, hi)            # lit top edge
+	PixelArt.vline(img, 11, 6, 27, out)           # outline: left / right / bottom
+	PixelArt.vline(img, 32, 6, 27, out)
+	PixelArt.hline(img, 11, 32, 22, out)
 	# grinding maw with bone teeth
-	draw_rect(Rect2(-5, -3, 10, 5), Color("161219"))
-	for tx in [-4.0, -2.0, 0.0, 2.0]:
-		draw_rect(Rect2(tx, -3, 1, 2), bone)
-		draw_rect(Rect2(tx + 1, 0, 1, 2), bone)
-	# glowing necrotic cracks + eyes
-	draw_line(Vector2(-3, -11), Vector2(-1, -6), crack, 1.0)
-	draw_line(Vector2(3, -12), Vector2(2, -8), crack, 1.0)
-	draw_rect(Rect2(-3.5, -10, 1.6, 1.6), crack); draw_rect(Rect2(2, -10, 1.6, 1.6), crack)
+	PixelArt.rect(img, 16, 20, 13, 7, Color("161219"))
+	for tx in [17, 20, 23, 26]:
+		PixelArt.vline(img, tx, 20, 3, bone)      # upper teeth
+		PixelArt.vline(img, tx + 1, 24, 3, bone)  # lower teeth
+	# glowing necrotic eyes + cracks
+	PixelArt.rect(img, 15, 12, 2, 2, crack); PixelArt.rect(img, 27, 12, 2, 2, crack)
+	PixelArt.line(img, 16, 9, 18, 15, crack)
+	PixelArt.line(img, 28, 8, 26, 14, crack)
+	PixelArt.line(img, 22, 15, 21, 19, crack)
 	# embedded bone shards
-	draw_rect(Rect2(-6, -9, 3, 1), bone); draw_rect(Rect2(3, -6, 3, 1), bone)
+	PixelArt.rect(img, 13, 17, 3, 1, bone); PixelArt.rect(img, 29, 15, 3, 1, bone)
+	return img

@@ -40,30 +40,40 @@ func _apply_branch(id: String, t: int) -> void:
 		attack_rate *= 1.2 if t == 1 else 1.3
 
 
-func _draw_body() -> void:
-	var mid := Color(0.22, 0.66, 0.42, 0.72)
+## Fine pixel art (art-direction §6/§7): a translucent hooded shroud with a face-hollow, a bound
+## soul orb, and binding chains — ethereal, no hard outline, glowing in the act accent.
+func _author_body() -> Image:
+	var mid := Color(0.22, 0.66, 0.42, 0.70)
 	var hi := Color(0.5, 0.92, 0.68, 0.85)
-	var core := Color(0.85, 1.0, 0.9, 0.92)
-	var hollow := Color(0.03, 0.09, 0.06, 0.75)
-	# spectral shroud — hood down to wispy tails, hovering above the plot
-	var shroud := PackedVector2Array([
-		Vector2(-6, 3), Vector2(-6, -6), Vector2(-3, -12), Vector2(0, -14), Vector2(3, -12),
-		Vector2(6, -6), Vector2(6, 3), Vector2(4, 0), Vector2(2, 4), Vector2(0, 0),
-		Vector2(-2, 4), Vector2(-4, 0),
-	])
-	draw_colored_polygon(shroud, mid)
-	# lit crown of the hood
-	draw_colored_polygon(PackedVector2Array([
-		Vector2(-3, -12), Vector2(0, -14), Vector2(3, -12), Vector2(0, -9)]), hi)
+	var core := Color(0.85, 1.0, 0.9, 0.95)
+	var hollow := Color(0.03, 0.09, 0.06, 0.85)
+	var chain := Color("4a4636")
+	var img := PixelArt.canvas(28, 42)
+	# hood crown — narrows to a point at the top
+	for y in range(5, 13):
+		var half := mini((y - 5) + 1, 8)
+		PixelArt.hline(img, 14 - half, y, half * 2, mid)
+	# shoulders + body
+	PixelArt.rect(img, 6, 13, 16, 16, mid)
+	# lit crown edge
+	for y in range(5, 11):
+		var half := (y - 5) + 1
+		PixelArt.px(img, 14 - half, y, hi); PixelArt.px(img, 13 + half, y, hi)
+	# wispy tails trailing below
+	var tails := [7, 11, 15, 18]
+	for i in tails.size():
+		var wx: int = tails[i]
+		var wlen := 6 + (i % 2) * 3
+		PixelArt.vline(img, wx, 28, wlen, mid)
+		PixelArt.px(img, wx, 28 + wlen - 1, hi)
 	# dark hollow where a face should be
-	draw_colored_polygon(PackedVector2Array([
-		Vector2(-3, -9), Vector2(0, -11), Vector2(3, -9), Vector2(2, -4), Vector2(-2, -4)]), hollow)
-	# glowing eyes + bound soul orb
-	draw_circle(Vector2(-1.8, -8), 1.0, core)
-	draw_circle(Vector2(1.8, -8), 1.0, core)
-	draw_circle(Vector2(0, -3), 1.6, core)
-	# bound chains across the middle
-	for cx in [-4.0, -1.0, 2.0]:
-		draw_rect(Rect2(cx, -2, 2, 1.4), Color("4a4636"))
-	draw_line(Vector2(-6, -1), Vector2(6, -2), Color("2a2620"), 1.0)
-	draw_polyline(shroud + PackedVector2Array([shroud[0]]), hi, 1.0)
+	PixelArt.rect(img, 10, 8, 8, 9, hollow)
+	# glowing eyes
+	PixelArt.rect(img, 11, 11, 2, 2, core); PixelArt.rect(img, 15, 11, 2, 2, core)
+	# bound soul orb at the chest
+	PixelArt.rect(img, 12, 20, 4, 4, core); PixelArt.rect(img, 13, 21, 2, 2, hi)
+	# binding chains across the middle
+	for cx in [7, 10, 13, 16, 19]:
+		PixelArt.rect(img, cx, 26, 2, 1, chain)
+	PixelArt.line(img, 6, 27, 21, 26, Color("2a2620"))
+	return img

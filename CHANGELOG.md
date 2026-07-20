@@ -5,6 +5,14 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 5 (minions as fine pixel art)** — the three minions are now authored as
+  **fine pixel art** via the `PixelArt` pipeline (NEAREST-filtered, ~2× the old build's linear
+  density) — the only pixelated layer on the smooth world (art-direction §0/§6). **Bone Archer**
+  (bone-white skeleton with a skull, ribcage, back-quiver and a drawn bone bow), **Bone-Mill Golem**
+  (hunched stone grinder with a bone-tooth maw and necrotic eyes/cracks), **Bound Wraith**
+  (translucent hooded shroud, face-hollow, bound soul orb, binding chains). Their soft plot/shadow,
+  range ring and tier pips stay smooth. Added a `PixelArt.line()` Bresenham helper (+ tests) for
+  diagonals. The grind shockwave stays a smooth overlay.
 - **M2b · Restyle, slice 4 (smooth phylactery)** — repainted the phylactery for the native-res
   world: a larger faceted crystal (seated in the socket) with a soft emissive aura and antialiased
   facet outline / cracks, on a smoother dais whose pixel rune-ticks became smooth accent rune-glyphs
