@@ -1,10 +1,12 @@
 extends Node2D
-## M0 orchestrator. Builds the world (fixed path, phylactery, build slots), spawns the HUD
+## Run orchestrator. Builds the world (fixed path, phylactery, build slots), spawns the HUD
 ## and wave manager, handles minion placement/upgrades via clicks, and resolves win/lose.
-## See docs/M0-prototype.md.
+## Entered from the Hub via "Begin Run"; returns there via "Return to Crypt".
 
 const ARCHER := preload("res://scripts/minions/bone_archer.gd")
 const GOLEM := preload("res://scripts/minions/bone_mill_golem.gd")
+
+const HUB_SCENE := "res://scenes/hub/hub.tscn"
 
 const SLOT_RADIUS := 8.0
 const SLOT_CLICK_RADIUS := 12.0
@@ -51,7 +53,7 @@ func _ready() -> void:
 	add_child(_hud)
 	_hud.minion_selected.connect(_on_minion_selected)
 	_hud.start_wave_pressed.connect(_on_start_wave)
-	_hud.retry_pressed.connect(_on_retry)
+	_hud.return_to_hub_pressed.connect(_on_return_to_hub)
 
 	GameState.bone_dust_changed.connect(_on_dust_changed)
 	_on_dust_changed(GameState.bone_dust)
@@ -125,8 +127,8 @@ func _on_start_wave() -> void:
 		_update_wave_hud()
 
 
-func _on_retry() -> void:
-	get_tree().reload_current_scene()
+func _on_return_to_hub() -> void:
+	get_tree().change_scene_to_file(HUB_SCENE)
 
 
 func _on_dust_changed(amount: int) -> void:
