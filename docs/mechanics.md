@@ -1,7 +1,8 @@
 # Mechanics Reference
 
 Player-facing reference for how the game works. Kept in sync with the code; the seed for a
-future in-game codex. *(Reflects the current build — M0. M1 content marked "planned".)*
+future in-game codex. *(Reflects the current build — the M0 core plus early M1: the Crypt,
+skill tree, and closed run loop. Later M1 content is marked "planned".)*
 
 ---
 
@@ -12,8 +13,9 @@ waves to win; if the phylactery's life hits zero, the run ends.
 
 ## Currencies
 - **Bone Dust** — earned from kills, spent during a run to raise/upgrade minions. Resets each run.
-- **Grave Bones** — persistent currency spent on the meta skill tree in the Crypt (already
-  spendable). *Earning* them by harvesting from runs is still being wired (planned, M1).
+- **Grave Bones** — persistent currency spent on the meta skill tree in the Crypt. Harvested
+  from kills during a run and banked when the run ends — **you keep them whether you win or
+  lose**, and a clear multiplies the harvest (×1.5).
 
 ## The counter system
 Every minion deals a **damage type**; every enemy has an **armor type**. The multiplier decides
@@ -53,13 +55,16 @@ and some changes are mechanical (the grunt's crawler stage moves slower).
 
 ## The Crypt (Hub) *(M1)*
 The game opens in **The Crypt** — your meta screen. Here you spend **Grave Bones** on the
-**skill tree** (unlocking minions and permanent buffs), then press **Begin Run** to play. When
-a run ends (win or lose), you **Return to Crypt** to spend and try again.
+**skill tree** for permanent buffs, then press **Begin Run**. During a run you harvest more
+Grave Bones from kills; when it ends (win or lose) you **Return to Crypt** to spend what you
+banked and try again — coming back stronger each time.
 
-*Still being wired (planned, M1):* tree purchases don't affect runs yet — buffs and
-minion-unlock gating aren't applied in-game, and harvesting Grave Bones from a run into the
-Crypt isn't hooked up. Right now the Crypt is navigable and saves your purchases, but the
-payoff lands in a later M1 feature.
+**Skill-tree buffs applied to each run:** +phylactery life, +starting Bone Dust, +% minion
+damage. (Minion *unlocks* are tracked but not yet enforced in-run — see below.)
+
+*Still being wired (planned, M1):* **minion-unlock gating** isn't enforced yet — the Golem is
+placeable even before you unlock it, and the tree's third minion (the Bound Wraith) can't be
+brought into a run until it ships. The buff and harvest halves of the loop work now.
 
 ## Controls
 **In the Crypt (Hub):**

@@ -1,7 +1,8 @@
 extends CanvasLayer
 class_name HUD
-## Code-built HUD for M0: currency / phylactery-life / wave readouts, minion-select buttons,
-## a start-wave button, and a centered end-game panel. Emits intent signals; Main wires them.
+## Code-built in-run HUD: Bone Dust / phylactery-life / wave / Grave Bones-harvest readouts,
+## minion-select buttons, a start-wave button, and a centered end-game panel (with the banked
+## harvest). Emits intent signals; the run orchestrator wires them.
 
 signal minion_selected(kind: String)
 signal start_wave_pressed
@@ -14,6 +15,7 @@ const PANEL_BG := Color(0.10, 0.08, 0.12, 0.92)
 var _dust_label: Label
 var _life_label: Label
 var _wave_label: Label
+var _harvest_label: Label
 var _hint_label: Label
 var _archer_btn: Button
 var _golem_btn: Button
@@ -34,6 +36,8 @@ func _build() -> void:
 	_dust_label = _make_label(Vector2(8, 6), "Bone Dust: 0")
 	_wave_label = _make_label(Vector2(8, 22), "Wave: -/-")
 	_life_label = _make_label(Vector2(316, 6), "Phylactery: 0")
+	_harvest_label = _make_label(Vector2(316, 22), "Harvest: +0")
+	_harvest_label.add_theme_color_override("font_color", Color(0.55, 0.9, 0.6))
 
 	# ---- minion select (bottom-left) ----
 	_archer_btn = _make_button(Vector2(8, 236), Vector2(108, 22), "Archer (50)")
@@ -130,6 +134,10 @@ func set_life(current: int, max_life: int) -> void:
 	_life_label.text = "Phylactery: %d/%d" % [current, max_life]
 
 
+func set_harvest(total: int) -> void:
+	_harvest_label.text = "Harvest: +%d" % total
+
+
 func set_wave(current: int, total: int, active: bool) -> void:
 	_wave_label.text = "Wave: %d/%d%s" % [current, total, "  (in progress)" if active else ""]
 	_start_btn.disabled = active
@@ -141,8 +149,10 @@ func clear_selection() -> void:
 	_golem_btn.button_pressed = false
 
 
-func show_end(won: bool) -> void:
-	_end_label.text = "The holy land kneels.\nYou win!" if won else "Your phylactery shatters...\nfor now."
+func show_end(won: bool, banked_bones: int) -> void:
+	var headline := "The holy land kneels.\nYou win!" if won else "Your phylactery shatters...\nfor now."
+	var bonus := "  (clear bonus!)" if won else ""
+	_end_label.text = "%s\n\nHarvested %d Grave Bones%s" % [headline, banked_bones, bonus]
 	_end_panel.visible = true
 	_start_btn.disabled = true
 

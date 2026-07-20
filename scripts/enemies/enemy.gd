@@ -7,13 +7,14 @@ class_name Enemy
 ## Visuals are drawn in code via _draw() so we need no art for M0 — subclasses override
 ## _draw() to render their per-stage shapes.
 
-signal died(reward: int, at_position: Vector2)
+signal died(reward: int, bones: int)
 signal reached_end(damage: int)
 
 @export var max_hp: float = 30.0
 @export var armor_type: CombatTypes.Armor = CombatTypes.Armor.BONE
 @export var move_speed: float = 40.0            ## pixels/sec along the path
-@export var reward: int = 8                     ## Bone Dust granted on death
+@export var reward: int = 8                     ## Bone Dust (in-run) granted on death
+@export var bones_harvest: int = 1              ## Grave Bones (meta) harvested on death
 @export var leak_damage: int = 1                ## phylactery life lost if it reaches the end
 
 ## Debone stage thresholds as fractions of max HP. Two thresholds → three stages.
@@ -120,7 +121,7 @@ func _die() -> void:
 	if _dead:
 		return
 	_dead = true
-	died.emit(reward, global_position)
+	died.emit(reward, bones_harvest)
 	queue_free()
 
 
