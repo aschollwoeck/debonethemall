@@ -5,6 +5,13 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 7 (vector HUD)** — restyled the in-run HUD from the carved bone/stone
+  diegetic look to a clean **vector** treatment (art-direction §10): flat dark panels with a thin
+  **necrotic hairline** border, near-square corners and minimal shadow, high contrast against the
+  pixel units. Passive readouts (Bone Dust / Wave / Harvest) carry a faint neutral hairline;
+  interactive elements the accent hairline — the **selected minion** and primary "Summon Wave" get
+  an accent outline + soft glow. Phylactery life meter, upgrade popup and end screen reframed to
+  match. Style-only — layout, logic and the Main-facing API are unchanged.
 - **M2b · Restyle, slice 6 (enemies as fine pixel art)** — the three enemies and all their **debone
   stages** are now fine pixel art (art-direction §0/§6/§7), the only pixelated layer on the smooth
   world. The base `Enemy` blits the current stage's texture NEAREST-filtered over a soft (smooth)
