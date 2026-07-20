@@ -5,9 +5,9 @@ is the reference for how it plays. When a visual choice is unclear, it should be
 here. Grounded in the **v2 mockup** (the agreed target):
 <https://claude.ai/code/artifact/37393ad4-be89-4e2c-b068-c09c19e5d73d>
 
-> **Everything shipped so far uses placeholder programmer-art** (ADR 0001). This doc defines the
-> target; the Visual Overhaul milestone ([`M2-visual-overhaul.md`](./M2-visual-overhaul.md))
-> replaces the placeholders with it.
+> **The Visual Overhaul (M2) has landed** ([`M2-visual-overhaul.md`](./M2-visual-overhaul.md)) —
+> this is now the *shipped* reference for a run's look, not just the target. Visuals remain
+> code-driven `_draw()` (ADR 0001); real commissioned pixel art is a later, optional step.
 
 ---
 
@@ -93,12 +93,14 @@ A shared kit, used sparingly so it stays unsettling: **skull pyramids, gibbet ca
 skeletons, heads on pikes, one-eyed ravens, bloodmarks on stone, dead trees, broken fences.**
 Dark humor through set design, not gags.
 
-## 10. HUD — diegetic
+## 10. HUD — diegetic *(implemented, slice 6)*
 No generic RTS chrome. The UI is *made of the world*:
-- **Bone plaques** for resource readouts (Bone Dust, Grave Bones) with small glyphs.
-- **Carved-stone buttons** (minion slots, Summon Wave) with a pressed 3D lip and accent glow when active.
-- **A cracked-phylactery meter** for life — green→red as it fails.
-- Monospace, tabular numerals for all counters; dark gothic panels with a thin lit top edge.
+- **Bone/stone plaques** for the resource readouts (Bone Dust, Wave, Harvest), colour-coded values.
+- **Carved-stone buttons** (minion slots, Summon Wave) with a lit top lip and an accent glow when active.
+- **A phylactery life meter** — green→red as it fails.
+- Dark gothic panels with a thin lit top edge (upgrade popup, end screen).
+- *Future polish:* a monospace/tabular-numeral font and small carved glyphs on the plaques
+  (skipped for now — the default font lacks reliable glyphs, so counters use plain coloured text).
 
 ## 11. Technical approach (Godot)
 How this gets built (for the overhaul):
