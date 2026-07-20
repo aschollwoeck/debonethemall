@@ -5,6 +5,12 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 4 (smooth phylactery)** — repainted the phylactery for the native-res
+  world: a larger faceted crystal (seated in the socket) with a soft emissive aura and antialiased
+  facet outline / cracks, on a smoother dais whose pixel rune-ticks became smooth accent rune-glyphs
+  and a faint rune-etched ring, with the crystal's light catching the surrounding stone. Its
+  life-driven behaviour is unchanged — necrotic green → blood-red and progressive fractures as life
+  falls.
 - **M2b · Restyle, slice 3 (lighting re-tune)** — re-tuned the additive lighting for the smooth
   native-res world: a soft moonlight pool under the backdrop's moon, a softer/wider phylactery
   bleed, warmer/larger brazier pools, and brighter road-rune glimmers. Per-act accent hook and
