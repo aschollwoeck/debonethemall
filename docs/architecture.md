@@ -24,6 +24,8 @@ scripts/
   meta/     skill_tree.gd      — SkillTree autoload: node data, purchase, run-modifier aggregation
             run_modifiers.gd   — RunModifiers value object (aggregated tree effects for a run)
   world/    backdrop.gd        — layered graveyard backdrop + cobbled path (draws behind gameplay)
+            lighting.gd        — additive glow pass (phylactery/braziers/runes/motes); per-act accent
+            vignette.gd        — heavy edge vignette over the world, under the HUD
   ui/       hud.gd             — code-built HUD (labels, buttons, end panel, upgrade popup)
   hub/      hub.gd             — Hub ("The Crypt") screen: skill-tree UI, purchasing, Begin Run
   main/     main.gd            — run orchestrator (world build, placement, win/lose)
@@ -83,8 +85,16 @@ Replacing placeholder art with the crypt aesthetic (docs/art-direction.md), slic
 gameplay — a horizon strip (sky, sick moon, crypt spires) over a top-down dark graveyard field
 (varied ground + macabre set-dressing: gravestones, skull piles, a summoning circle, braziers,
 …) with drifting ground fog, plus the cobbled path with glowing rune-stones (given the enemy
-path via `setup()`). Props are placed clear of the path and build slots. `main._draw()` now draws only the build-slot markers. Lighting/vignette (slice 2),
-re-arted sprites (slices 3–5), and the diegetic HUD (slice 6) follow.
+path via `setup()`). Props are placed clear of the path and build slots. `main._draw()` now draws
+only the build-slot markers.
+
+The **`Lighting`** node (`world/lighting.gd`, `z 5`, additive `CanvasItemMaterial`) draws soft
+glow pools over the world — phylactery, braziers, summoning circle, rune-stones — plus drifting
+necrotic motes, from a procedurally-generated glow texture; its `accent` color is the **per-act
+signature glow** (green default, one value → witchfire purple later). The **`Vignette`** node
+(`world/vignette.gd`, `z 8`) crushes the edges to dark. Both sit under the HUD `CanvasLayer`.
+
+Re-arted sprites (slices 3–5) and the diegetic HUD (slice 6) follow.
 
 ## Core patterns
 - **Container UI vs. absolute UI:** the **Hub** uses Godot container nodes (`MarginContainer` /

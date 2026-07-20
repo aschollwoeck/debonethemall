@@ -15,6 +15,11 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   gravel) and a macabre set-dressing scatter — gravestones, dead trees, skull piles, staked
   skulls, a necrotic summoning circle, braziers, blood pools, loose bones, a broken fence —
   placed clear of the path and build slots. Their glow blooms in the lighting slice.
+- **M2 · Visual overhaul, slice 2 (lighting & atmosphere)** — an additive `Lighting` pass draws
+  glow pools over the world (phylactery, braziers, summoning circle, rune-stones) + drifting
+  necrotic motes from a procedural glow texture, and a `Vignette` crushes the edges into
+  oppressive dark. The lighting's `accent` is the **per-act signature glow** — green now, one
+  value swaps a later act to witchfire purple. Turns the dark field into a lit, oppressive place.
 
 ### Added
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
