@@ -24,7 +24,11 @@ var tier: int = 0
 ## Pixel-art body (docs/art-direction.md §0/§6): the unit is the only pixelated layer. Subclasses
 ## author fine pixel art via `_author_body()`; it's drawn NEAREST-filtered and upscaled by
 ## `BODY_SCALE` logical px per texel, feet seated on the (smooth) plot at `FEET_Y`.
-const BODY_SCALE := 0.5     # logical px per source texel → ~2× the old build's linear density
+## logical px per source texel → ~2× the old build's linear density. This 0.5 blit path
+## deliberately diverges from PixelArt.sprite()'s whole-number-scale rule: minions are static, so
+## the sub-integer factor introduces no motion shimmer, and authoring at 2× texel density is how we
+## get the "more pixels per unit" fine grid (art-direction §0/§6).
+const BODY_SCALE := 0.5
 const FEET_Y := 7.0         # where the sprite's feet meet the plot
 
 var _cooldown: float = 0.0
