@@ -1,28 +1,30 @@
 extends CanvasLayer
 class_name HUD
-## Diegetic in-run HUD (M2 slice 6, docs/art-direction.md §10). The UI is made of the world:
-## carved bone/stone plaques for the Bone Dust / Wave / Harvest readouts, a phylactery life
-## meter (green→red), carved-stone buttons with an accent glow when active, and
-## gothic panels for the upgrade popup and end screen. Emits intent signals; Main wires them.
+## Vector in-run HUD (M2b restyle slice 7, docs/art-direction.md §10). Clean vector treatment —
+## flat dark panels with a thin necrotic hairline border, minimal texture, high contrast against
+## the pixel units: resource plaques (Bone Dust / Wave / Harvest), a phylactery life meter
+## (green→red), flat buttons where the selected minion gets an accent hairline + glow, and flat
+## panels for the upgrade popup and end screen. Emits intent signals; Main wires them.
 ##
-## Public API is unchanged from the flat HUD, so Main needs no edits.
+## Public API is unchanged, so Main needs no edits.
 
 signal minion_selected(kind: String)
 signal start_wave_pressed
 signal return_to_hub_pressed
 signal upgrade_chosen(id: String)
 
-# --- palette ---
+# --- palette (vector UI, art-direction §3/§10) ---
 const BONE := Color("ece3cb")
 const INK_DIM := Color("6f6784")
 const EMBER := Color("e8a24a")
 const NECRO := Color("63e39a")
 const BLOOD := Color("c8434a")
-const STONE_BG := Color("1a1526")
-const STONE_BG2 := Color("241d33")
-const STONE_BORDER := Color("463d5c")
-const STONE_BORDER_HI := Color("5e5478")
-const PANEL_BG := Color(0.07, 0.05, 0.10, 0.97)
+const PANEL := Color(0.05, 0.045, 0.09, 0.90)        # flat dark plaque bg
+const PANEL_HI := Color(0.09, 0.08, 0.15, 0.95)      # hover / active bg
+const PANEL_SOLID := Color(0.05, 0.04, 0.09, 0.98)   # opaque popup bg
+const HAIR := Color(0.39, 0.89, 0.60, 0.55)          # necrotic accent hairline
+const HAIR_DIM := Color(0.62, 0.68, 0.78, 0.20)      # faint neutral hairline (passive)
+const ACCENT_GLOW := Color(0.39, 0.89, 0.60, 0.32)   # soft accent bloom on active elements
 
 var _dust_val: Label
 var _wave_val: Label
@@ -46,49 +48,51 @@ func _ready() -> void:
 
 # ---------------------------------------------------------------- style helpers
 
+## A flat vector box: solid dark bg, a 1px hairline border, near-square corners, no carved lip.
+## An optional accent `glow` blooms softly behind active elements (no drop shadow otherwise).
 func _sbox(bg: Color, border: Color, glow := Color(0, 0, 0, 0)) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
-	s.set_corner_radius_all(3)
-	s.border_width_left = 1; s.border_width_right = 1; s.border_width_bottom = 1
-	s.border_width_top = 2   # a lit carved top lip
+	s.set_corner_radius_all(1)
+	s.set_border_width_all(1)
 	s.border_color = border
 	s.content_margin_left = 7; s.content_margin_right = 7
 	s.content_margin_top = 3; s.content_margin_bottom = 4
 	if glow.a > 0.0:
 		s.shadow_color = glow; s.shadow_size = 4
-	else:
-		s.shadow_color = Color(0, 0, 0, 0.55); s.shadow_size = 2; s.shadow_offset = Vector2(1, 2)
 	return s
 
 
-## Applies carved-stone styling to a button. kind: "stone" | "primary" | "toggle".
+## Applies flat vector styling to a button. kind: "stone" | "primary" | "toggle".
+## Interactive/active states carry the necrotic accent hairline + glow; passive states a faint
+## neutral hairline. A selected (toggled) minion reads by its accent outline (art-direction §10).
 func _style_button(b: Button, kind: String) -> void:
 	b.focus_mode = Control.FOCUS_NONE
 	b.add_theme_font_size_override("font_size", 11)
 	b.add_theme_color_override("font_color", BONE)
 	b.add_theme_color_override("font_hover_color", Color.WHITE)
-	b.add_theme_color_override("font_pressed_color", Color("0c1a10") if kind != "stone" else BONE)
+	b.add_theme_color_override("font_pressed_color", NECRO)
+	b.add_theme_color_override("font_focus_color", BONE)
 	b.add_theme_color_override("font_disabled_color", INK_DIM)
-	var accent_glow := Color(NECRO.r, NECRO.g, NECRO.b, 0.5)
-	b.add_theme_stylebox_override("normal",
-		_sbox(STONE_BG2, STONE_BORDER, accent_glow if kind == "primary" else Color(0, 0, 0, 0)))
-	b.add_theme_stylebox_override("hover", _sbox(Color("2e2644"), STONE_BORDER_HI))
-	var pressed_bg := Color("14101d") if kind == "stone" else Color(0.24, 0.72, 0.46)
-	var pressed_glow := accent_glow if kind == "toggle" else Color(0, 0, 0, 0)
-	b.add_theme_stylebox_override("pressed", _sbox(pressed_bg, STONE_BORDER_HI, pressed_glow))
-	b.add_theme_stylebox_override("disabled", _sbox(Color("120f18"), Color("2e2840")))
+	# normal: the primary CTA already wears the accent hairline; the rest a faint neutral one.
+	var normal_border := HAIR if kind == "primary" else HAIR_DIM
+	var normal_glow := ACCENT_GLOW if kind == "primary" else Color(0, 0, 0, 0)
+	b.add_theme_stylebox_override("normal", _sbox(PANEL, normal_border, normal_glow))
+	b.add_theme_stylebox_override("hover", _sbox(PANEL_HI, HAIR))
+	# pressed (momentary) / toggled-selected: accent hairline + glow.
+	b.add_theme_stylebox_override("pressed", _sbox(PANEL_HI, HAIR, ACCENT_GLOW))
+	b.add_theme_stylebox_override("disabled", _sbox(Color(0.04, 0.035, 0.07, 0.85), HAIR_DIM))
 
 
+## Flat dark popup frame (upgrade / end screen): solid bg, a necrotic hairline, a soft lift shadow.
 func _panel_box() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.bg_color = PANEL_BG
-	s.set_corner_radius_all(5)
+	s.bg_color = PANEL_SOLID
+	s.set_corner_radius_all(2)
 	s.set_border_width_all(1)
-	s.border_width_top = 2
-	s.border_color = Color("5a4f36")   # bone-ish frame
+	s.border_color = HAIR
 	s.set_content_margin_all(12)
-	s.shadow_color = Color(0, 0, 0, 0.6); s.shadow_size = 6
+	s.shadow_color = Color(0, 0, 0, 0.5); s.shadow_size = 8
 	return s
 
 
@@ -98,7 +102,7 @@ func _panel_box() -> StyleBoxFlat:
 func _plaque(pos: Vector2, prefix: String, value_color: Color) -> Label:
 	var panel := PanelContainer.new()
 	panel.position = pos
-	panel.add_theme_stylebox_override("panel", _sbox(STONE_BG, STONE_BORDER))
+	panel.add_theme_stylebox_override("panel", _sbox(PANEL, HAIR_DIM))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 5)
 	panel.add_child(row)
@@ -125,7 +129,7 @@ func _build() -> void:
 	life_frame.position = Vector2(316, 6)
 	life_frame.custom_minimum_size = Vector2(150, 15)
 	life_frame.size = Vector2(150, 15)
-	life_frame.add_theme_stylebox_override("panel", _sbox(Color("0a0812"), STONE_BORDER))
+	life_frame.add_theme_stylebox_override("panel", _sbox(Color(0.03, 0.025, 0.06, 0.95), HAIR))
 	add_child(life_frame)
 	_life_fill = ColorRect.new()
 	_life_fill.position = Vector2(318, 8)
@@ -137,7 +141,10 @@ func _build() -> void:
 	_life_text.size = Vector2(150, 15)
 	_life_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_life_text.add_theme_font_size_override("font_size", 9)
-	_life_text.add_theme_color_override("font_color", Color("0a0812"))
+	# bone text with a dark outline so it reads over both the green fill and the dark remainder
+	_life_text.add_theme_color_override("font_color", BONE)
+	_life_text.add_theme_color_override("font_outline_color", Color(0.02, 0.02, 0.04, 0.9))
+	_life_text.add_theme_constant_override("outline_size", 2)
 	add_child(_life_text)
 
 	_harvest_val = _plaque(Vector2(316, 28), "HARVEST +", NECRO)
