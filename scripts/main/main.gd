@@ -48,6 +48,11 @@ func _ready() -> void:
 	_mods = SkillTree.build_run_modifiers()
 	_damage_mult = _mods.minion_damage_mult
 
+	# Atmospheric backdrop + cobbled path (draws behind gameplay). M2 slice 1.
+	var backdrop := Backdrop.new()
+	add_child(backdrop)
+	backdrop.setup(_path)
+
 	# Apply meta buffs: starting Bone Dust bonus on top of the base.
 	GameState.reset_run()
 	GameState.add(_mods.starting_dust_bonus)
@@ -253,10 +258,8 @@ func _update_wave_hud() -> void:
 # ---------------------------------------------------------------- drawing (path + slots)
 
 func _draw() -> void:
-	# path: dark casing + bone-dust track
-	draw_polyline(_path, Color(0.10, 0.09, 0.12), 16.0)
-	draw_polyline(_path, Color(0.28, 0.24, 0.20), 11.0)
-	# build slots
+	# The cobbled path is now drawn by the Backdrop (behind gameplay). Here we draw only the
+	# build-slot markers (the gameplay overlay), which sit above the path but below minions.
 	var can_afford_selected := _selected_affordable()
 	for i in _slots.size():
 		var p: Vector2 = _slots[i]

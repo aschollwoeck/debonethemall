@@ -4,6 +4,13 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 
 ## [Unreleased]
 
+### Changed
+- **M2 · Visual overhaul, slice 1 (backdrop & tileset)** — replaced the flat grey field + brown
+  polyline with a layered `Backdrop`: a horizon strip (cold sky, sick moon, crypt-spire
+  silhouettes) over a top-down dark graveyard field with drifting ground fog, and a cobbled
+  path with glowing rune-stones. Draws behind gameplay (`z_index -10`). First step toward the
+  `docs/art-direction.md` target; lighting and re-arted sprites follow in later slices.
+
 ### Added
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
   branches (Archer: Volley/Piercer · Golem: Wider Grind/Bone Crusher · Wraith: Reaper/Warden),

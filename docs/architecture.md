@@ -23,6 +23,7 @@ scripts/
   minions/  minion.gd (base) + bone_archer.gd, bone_mill_golem.gd, bound_wraith.gd, projectile.gd
   meta/     skill_tree.gd      — SkillTree autoload: node data, purchase, run-modifier aggregation
             run_modifiers.gd   — RunModifiers value object (aggregated tree effects for a run)
+  world/    backdrop.gd        — layered graveyard backdrop + cobbled path (draws behind gameplay)
   ui/       hud.gd             — code-built HUD (labels, buttons, end panel, upgrade popup)
   hub/      hub.gd             — Hub ("The Crypt") screen: skill-tree UI, purchasing, Begin Run
   main/     main.gd            — run orchestrator (world build, placement, win/lose)
@@ -76,14 +77,22 @@ can hit multiple enemies (e.g. the Archer's *Volley* raises `targets`).
 *Balance:* enemy HP was raised as a first-pass difficulty bump so the counter matrix bites;
 final tuning is a playtest task.
 
+## Visuals (M2 overhaul, in progress)
+Replacing placeholder art with the crypt aesthetic (docs/art-direction.md), slice by slice. The
+**`Backdrop`** node (`world/backdrop.gd`, `z_index = -10`) draws the atmospheric world behind
+gameplay — a horizon strip (sky, sick moon, crypt spires) over a top-down dark graveyard field
+with drifting ground fog, plus the cobbled path with glowing rune-stones (given the enemy path
+via `setup()`). `main._draw()` now draws only the build-slot markers. Lighting/vignette (slice 2),
+re-arted sprites (slices 3–5), and the diegetic HUD (slice 6) follow.
+
 ## Core patterns
 - **Container UI vs. absolute UI:** the **Hub** uses Godot container nodes (`MarginContainer` /
   `VBox` / `HBox`) for auto-layout — robust against the anchor-preset-plus-manual-`.position` bug
   that once made HUD controls invisible. The in-run **HUD** uses absolute positions (safe only
   because the run viewport is a fixed 480×270). Prefer containers for any non-trivial layout.
-- **Code-driven world:** `main.gd` builds the path, phylactery, build slots, wave manager, and
-  HUD in `_ready()` rather than composing a big `.tscn`. Keeps scenes un-fragile and lets us
-  verify by running.
+- **Code-driven world:** `main.gd` builds the backdrop, path, phylactery, build slots, wave
+  manager, and HUD in `_ready()` rather than composing a big `.tscn`. Keeps scenes un-fragile
+  and lets us verify by running.
 - **`_draw()` visuals:** enemies/minions/phylactery render themselves in code. Swapping in real
   pixel art later means replacing `_draw()` bodies (or moving to `AnimatedSprite2D`), not
   rewiring logic.
