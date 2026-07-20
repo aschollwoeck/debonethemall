@@ -5,11 +5,28 @@ is the reference for how it plays. When a visual choice is unclear, it should be
 here. Grounded in the **v2 mockup** (the agreed target):
 <https://claude.ai/code/artifact/37393ad4-be89-4e2c-b068-c09c19e5d73d>
 
-> **The Visual Overhaul (M2) has landed** ([`M2-visual-overhaul.md`](./M2-visual-overhaul.md)) —
-> this is now the *shipped* reference for a run's look, not just the target. Visuals remain
-> code-driven `_draw()` (ADR 0001); real commissioned pixel art is a later, optional step.
+> **Direction revised (2026-07) → mixed resolution.** M2 shipped a single low-res, big-pixel
+> look; playtesting rejected it. The new target (mockup:
+> <https://claude.ai/code/artifact/49367d6d-6c9d-4228-b08b-8248a68a216c>) is **finer-pixel-art
+> units on smooth, painted backgrounds, with a clean vector UI** and a **necromantic-sigil skill
+> tree**. The **Restyle** milestone ([`M2b-restyle.md`](./M2b-restyle.md)) rebuilds the rendering
+> to this. The M2 work below (composition, palette, lighting logic, props, tone) carries; the
+> *rendering approach* is superseded by §0.
 
 ---
+
+## 0. Rendering — mixed resolution (the defining choice)
+Two layers, deliberately different resolutions:
+- **Units are pixel art** — minions, enemies, projectiles. Drawn at a *fine* pixel grid
+  (~30–48 px tall, roughly 4× the density of the old build), crisp (nearest-filtered), with real
+  per-unit detail. This is where the handcrafted grit lives.
+- **Everything else is smooth** — backgrounds, lighting, the phylactery, fog, and the whole UI
+  are rendered at native/high resolution with **no visible pixels** (soft gradients, glows,
+  painted silhouettes). Menus and the skill tree can be as ornate as we like — they aren't
+  fighting a pixel grid.
+
+The contrast (crisp creatures on a soft world) *is* the look. The game no longer runs in a tiny
+480×270 viewport; it renders at native resolution, and units are the only pixelated layer.
 
 ## 1. One-line vision
 **Crazy-dark pixel fantasy, Terraria-detailed.** Oppressive black, swallowed by one eerie light,
@@ -55,12 +72,13 @@ The single biggest lever from "blocks on grey" to "a place":
 - **Heavy vignette** crushes the edges; the dark is oppressive on purpose.
 - Torches **flicker**; the phylactery **pulses**; embers rise; necrotic motes drift.
 
-## 6. Sprites — bone-white weight
-- **Three shades + a dark outline** per figure (shadow / mid / highlight / outline), read
-  bone-white against the dark ground.
-- **A soft cast shadow** under every unit — grounds it, adds depth.
-- **Silhouette-first:** recognizable by shape alone at gameplay scale.
-- **Scale:** chunky — figures ~16–20 px tall on the 480×270 base viewport (as in the mockup).
+## 6. Sprites — fine pixel art, bone-white weight
+- **Pixel art** (nearest-filtered), the only pixelated layer — see §0.
+- **Fine grid:** ~30–48 px tall per figure (≈4× the old build's density), so there's room for real
+  detail — a proper skull with sockets, a ribcage, a bone bow — not just a suggestive silhouette.
+- **Shaded:** multiple bone shades + a dark outline, read bone-white against the smooth dark world.
+- **A soft cast shadow** under every unit — grounds the crisp sprite on the soft ground.
+- **Silhouette-first** still holds at gameplay scale, now with detail on top.
 - **Debone stages** (HP-threshold, GDD §6) are macabre slapstick: intact → a part pops off (skull
   still grinning) → collapse to a bone pile. Each enemy debones in its own way.
 
@@ -93,22 +111,37 @@ A shared kit, used sparingly so it stays unsettling: **skull pyramids, gibbet ca
 skeletons, heads on pikes, one-eyed ravens, bloodmarks on stone, dead trees, broken fences.**
 Dark humor through set design, not gags.
 
-## 10. HUD — diegetic *(implemented, slice 6)*
-No generic RTS chrome. The UI is *made of the world*:
-- **Bone/stone plaques** for the resource readouts (Bone Dust, Wave, Harvest), colour-coded values.
-- **Carved-stone buttons** (minion slots, Summon Wave) with a lit top lip and an accent glow when active.
+## 10. HUD & menus — vector, smooth *(restyle target)*
+Smooth (no pixels), clean **vector** treatment — flat dark panels with a **thin necrotic hairline
+border**, minimal texture, high contrast against the pixel units:
+- Resource readouts (Bone Dust, Wave, Harvest) in flat panels, colour-coded values.
+- Minion slots + Summon Wave as flat buttons; the selected minion gets an accent outline/glow.
 - **A phylactery life meter** — green→red as it fails.
-- Dark gothic panels with a thin lit top edge (upgrade popup, end screen).
-- *Future polish:* a monospace/tabular-numeral font and small carved glyphs on the plaques
-  (skipped for now — the default font lacks reliable glyphs, so counters use plain coloured text).
+- Upgrade popup and end screen as flat gothic panels.
+
+### The skill tree — a necromantic sigil
+The Hub's tree is a **radiating sigil**: a central glowing skull-core with **vein-branches**
+curving outward to nodes along each route. Node states read at a glance — **owned** (accent glow),
+**available** (amber pulse), **locked** (dim behind a gate). Concentric sigil rings frame it.
+Smooth-rendered; connecting veins light up as a branch is unlocked. Replaces the column-of-buttons
+Hub. (Thematically the GDD's "necromantic sigil / growing spine", GDD §10.)
 
 ## 11. Technical approach (Godot)
-How this gets built (for the overhaul):
+How this gets built (mixed resolution, §0). The Restyle milestone
+([`M2b-restyle.md`](./M2b-restyle.md)) implements this; the notes below describe the *target*
+pipeline (the sub-bullets tagged "implemented" describe the superseded M2 build kept for reference):
+- **Resolution:** render at native/high resolution (not the old 480×270 viewport); default texture
+  filter **Linear** (smooth) so backgrounds and UI have no visible pixels.
+- **Smooth world** (background, phylactery, lighting, fog): code-drawn at native res with soft
+  gradients/glows/silhouettes — smooth by virtue of the higher resolution.
+- **Pixel units**: each unit is drawn as pixel art into a small `Image`/`ImageTexture` (~30–48 px)
+  and displayed **nearest-filtered, upscaled** (a `Sprite2D` with `texture_filter = NEAREST`, or a
+  per-unit nearest draw), so only the units are pixelated. This is the one pipeline piece M2 lacked.
+- **Vector UI + sigil tree** (§10): flat Control panels with a thin hairline; the skill tree is a
+  code-drawn smooth sigil graph.
 - **Layered background** via parallax layers / stacked `CanvasLayer`s or a prerendered scene, drawn
   back-to-front per §8.
-- **Sprites**: keep the code-driven `_draw()` approach for now (shaded, per §6) so we can iterate
-  without an asset pipeline; graduate to `Sprite2D`/`AnimatedSprite2D` if/when we commission real art.
-- **Lighting** *(implemented, slice 2)*: a code-driven additive pass — a soft radial glow
+- **Lighting** *(implemented, slice 2 — carries over, re-tuned for native res)*: a code-driven additive pass — a soft radial glow
   texture drawn per light source through an additive `CanvasItemMaterial` (`world/lighting.gd`,
   `z 5`), plus a dark radial `Vignette` overlay (`world/vignette.gd`, `z 8`), both under the HUD
   CanvasLayer. The **act accent** is one exported `Color` tinting the necrotic lights (braziers
