@@ -25,8 +25,9 @@ Two layers, deliberately different resolutions:
   painted silhouettes). Menus and the skill tree can be as ornate as we like — they aren't
   fighting a pixel grid.
 
-The contrast (crisp creatures on a soft world) *is* the look. The game no longer runs in a tiny
-480×270 viewport; it renders at native resolution, and units are the only pixelated layer.
+The contrast (crisp creatures on a soft world) *is* the look. The game no longer renders as one
+uniform 480×270 pixel grid — the 480×270 base is now just a logical coordinate space, rasterized
+smooth at native resolution — and units are the only pixelated layer.
 
 ## 1. One-line vision
 **Crazy-dark pixel fantasy, Terraria-detailed.** Oppressive black, swallowed by one eerie light,
@@ -130,8 +131,8 @@ Hub. (Thematically the GDD's "necromantic sigil / growing spine", GDD §10.)
 How this gets built (mixed resolution, §0). The Restyle milestone
 ([`M2b-restyle.md`](./M2b-restyle.md)) implements this; the notes below describe the *target*
 pipeline (the sub-bullets tagged "implemented" describe the superseded M2 build kept for reference):
-- **Resolution:** render at native/high resolution (not the old 480×270 viewport); default texture
-  filter **Linear** (smooth) so backgrounds and UI have no visible pixels.
+- **Resolution:** `canvas_items` stretch rasterizes the 480×270 logical base smooth at native
+  resolution; default texture filter **Linear** so backgrounds and UI have no visible pixels.
 - **Smooth world** (background, phylactery, lighting, fog): code-drawn at native res with soft
   gradients/glows/silhouettes — smooth by virtue of the higher resolution.
 - **Pixel units**: each unit is drawn as pixel art into a small `Image`/`ImageTexture` (~30–48 px)

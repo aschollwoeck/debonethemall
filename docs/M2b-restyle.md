@@ -27,14 +27,16 @@ uniform big-pixel look. M2b splits that into two layers (art-direction §0):
 - **Pixel units** — minions/enemies/projectiles drawn as pixel art at a fine grid and shown
   **nearest-filtered, upscaled**, so they stay crisp pixels on the smooth world.
 
-Because coordinates change (480×270 → native), the existing `_draw()` world/HUD code is re-based,
-not reused verbatim.
+**Implemented (slice 1, [ADR 0004](./adr/0004-mixed-resolution-rendering.md)):** the 480×270 base
+is **kept as a logical coordinate space** — only the stretch mode + filter changed, so existing
+`_draw()`/HUD/gameplay coordinates are reused verbatim and the world rasterizes smooth at native
+res. No coordinate re-basing was needed.
 
 ## In scope — built in slices (each its own PR)
-1. **Rendering foundation** — switch `project.godot` to native resolution + Linear filter; a
-   reusable **pixel-unit pipeline** (draw pixel art → `ImageTexture` → nearest-filtered `Sprite2D`,
-   or a nearest per-unit draw helper); confirm the world still lays out (path, slots, waypoints
-   rescaled). Gameplay/logic unchanged.
+1. **Rendering foundation** *(done)* — `project.godot` stretch `canvas_items` + Linear filter
+   (smooth world at native res; 480×270 kept as logical coords, no re-base); the reusable
+   **pixel-unit pipeline** `PixelArt` (author pixel art into an `Image` → NEAREST-filtered
+   `Sprite2D`). Gameplay/logic unchanged.
 2. **Smooth backdrop** — repaint the graveyard at native res: soft gradient sky + glowing moon,
    blurred spire silhouettes, misty ground, a smooth-lit road with rune glimmers, painted
    gravestones/props (the macabre kit, smooth). Replaces the pixel `Backdrop`.
@@ -63,8 +65,9 @@ not reused verbatim.
 - [ ] Side-by-side, the running game reads like the restyle mockup.
 
 ## Technical notes (Godot)
-- **Resolution/filter:** `project.godot` → higher base (e.g. 1280×720) or native window size,
-  `stretch/mode = canvas_items` + `aspect = expand/keep`, `default_texture_filter = Linear`.
+- **Resolution/filter:** `project.godot` keeps the 480×270 base as a **logical coordinate space**
+  with `stretch/mode = canvas_items` + `aspect = keep` and `default_texture_filter = Linear` — the
+  window rasterizes at native resolution (smooth), coordinates unchanged. (No larger base needed.)
 - **Pixel-unit helper:** render a unit's pixel art once into an `Image` → `ImageTexture`, set the
   displaying node's `texture_filter = TEXTURE_FILTER_NEAREST`, scale up. Cache per unit type.
 - **Smooth code-draw:** at native res, `_draw()` gradients/arcs are smooth; use `draw_*` with
