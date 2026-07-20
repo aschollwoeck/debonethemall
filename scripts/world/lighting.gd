@@ -11,6 +11,7 @@ class_name Lighting
 @export var accent: Color = Color("63e39a")
 
 const EMBER := Color("e8a24a")
+const MOONLIGHT := Color(0.60, 0.74, 0.62)   # soft green-white moon pool
 
 var _glow: Texture2D
 var _t: float = 0.0
@@ -54,23 +55,25 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var pulse := 0.5 + 0.5 * sin(_t * 3.0)
-	# phylactery — the brightest source, a tight core + a wide bleed
-	_light(_phyl, 50.0, accent, 0.22 + 0.12 * pulse)
-	_light(_phyl, 92.0, accent, 0.05 + 0.03 * pulse)
+	# soft moonlight pooling from the horizon (matches the backdrop's moon)
+	_light(Vector2(240, 22), 120.0, MOONLIGHT, 0.05)
+	# phylactery — the brightest source, a tight core + a wide soft bleed
+	_light(_phyl, 56.0, accent, 0.24 + 0.13 * pulse)
+	_light(_phyl, 112.0, accent, 0.06 + 0.03 * pulse)
 	# summoning circle
-	_light(_summon, _summon_r + 10.0, accent, 0.14 + 0.07 * pulse)
-	# path rune-stones catch the light
+	_light(_summon, _summon_r + 14.0, accent, 0.15 + 0.07 * pulse)
+	# stone-road rune glimmers catch the light
 	for r in _runes:
-		_light(r, 7.0, accent, 0.10 + 0.05 * sin(_t * 4.0 + r.x * 0.1))
+		_light(r, 9.0, accent, 0.11 + 0.05 * sin(_t * 4.0 + r.x * 0.1))
 	# braziers — warm amber, flickering
 	for b in _braziers:
 		var flick := 0.6 + 0.4 * absf(sin(_t * 20.0 + b.x) + 0.3 * sin(_t * 47.0))
-		_light(b + Vector2(0, -4), 26.0, EMBER, 0.28 * flick)
+		_light(b + Vector2(0, -4), 32.0, EMBER, 0.30 * flick)
 	# drifting necrotic motes
 	for mo in _motes:
 		var y: float = mo.p.y - fmod(_t * mo.sp, 40.0)
 		var x: float = mo.p.x + sin(_t * 0.8 + mo.ph) * 4.0
-		_light(Vector2(x, y), 3.0, accent, 0.30)
+		_light(Vector2(x, y), 3.5, accent, 0.30)
 
 
 ## Draws one additive glow of radius `r` tinted `col` at `intensity` (0–1).
