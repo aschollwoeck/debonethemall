@@ -7,6 +7,7 @@ class_name HUD
 signal minion_selected(kind: String)
 signal start_wave_pressed
 signal return_to_hub_pressed
+signal upgrade_chosen(id: String)
 
 const PANEL_BG := Color(0.10, 0.08, 0.12, 0.92)
 
@@ -20,6 +21,9 @@ var _minion_ids: Array[String] = []
 var _start_btn: Button
 var _end_panel: PanelContainer
 var _end_label: Label
+var _upgrade_panel: PanelContainer
+var _upgrade_vbox: VBoxContainer
+var _upgrade_title: Label
 
 
 func _ready() -> void:
@@ -51,8 +55,9 @@ func _build() -> void:
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint_label.add_theme_font_size_override("font_size", 9)
 
-	# ---- end-game panel ----
+	# ---- panels ----
 	_build_end_panel()
+	_build_upgrade_panel()
 
 
 func _make_label(pos: Vector2, text: String) -> Label:
@@ -104,6 +109,29 @@ func _build_end_panel() -> void:
 	add_child(_end_panel)
 
 
+func _build_upgrade_panel() -> void:
+	_upgrade_panel = PanelContainer.new()
+	_upgrade_panel.position = Vector2(150, 70)
+	_upgrade_panel.custom_minimum_size = Vector2(180, 0)
+	var style := StyleBoxFlat.new()
+	style.bg_color = PANEL_BG
+	style.set_corner_radius_all(6)
+	style.set_content_margin_all(10)
+	_upgrade_panel.add_theme_stylebox_override("panel", style)
+
+	_upgrade_vbox = VBoxContainer.new()
+	_upgrade_vbox.add_theme_constant_override("separation", 6)
+	_upgrade_panel.add_child(_upgrade_vbox)
+
+	_upgrade_title = Label.new()
+	_upgrade_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_upgrade_title.add_theme_font_size_override("font_size", 11)
+	_upgrade_vbox.add_child(_upgrade_title)
+
+	_upgrade_panel.visible = false
+	add_child(_upgrade_panel)
+
+
 func _select(kind: String) -> void:
 	for i in _minion_btns.size():
 		_minion_btns[i].button_pressed = _minion_ids[i] == kind
@@ -149,6 +177,36 @@ func set_wave(current: int, total: int, active: bool) -> void:
 func clear_selection() -> void:
 	for b in _minion_btns:
 		b.button_pressed = false
+
+
+## Shows the upgrade choices for a clicked minion. `options`: [{id, label, cost}].
+## Emits `upgrade_chosen(id)` when a choice is pressed.
+func show_upgrades(minion_name: String, options: Array) -> void:
+	# rebuild option buttons (keep the title as the first child)
+	for child in _upgrade_vbox.get_children():
+		if child != _upgrade_title:
+			_upgrade_vbox.remove_child(child)
+			child.queue_free()
+	_upgrade_title.text = "Upgrade %s" % minion_name
+	for opt in options:
+		var id: String = opt["id"]
+		var btn := Button.new()
+		btn.text = "%s  (%d)" % [opt["label"], opt["cost"]]
+		btn.focus_mode = Control.FOCUS_NONE
+		btn.add_theme_font_size_override("font_size", 10)
+		btn.disabled = int(opt["cost"]) > GameState.bone_dust   # grey out if unaffordable
+		btn.pressed.connect(func(): upgrade_chosen.emit(id))
+		_upgrade_vbox.add_child(btn)
+	_upgrade_panel.visible = true
+
+
+## Hides the upgrade popup and clears its option buttons.
+func hide_upgrades() -> void:
+	_upgrade_panel.visible = false
+	for child in _upgrade_vbox.get_children():
+		if child != _upgrade_title:
+			_upgrade_vbox.remove_child(child)
+			child.queue_free()
 
 
 func show_end(won: bool, banked_bones: int) -> void:

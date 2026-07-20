@@ -35,6 +35,7 @@ var _waves: WaveManager
 var _hud: HUD
 var _selected_kind: String = ""
 var _game_over: bool = false
+var _upgrading_idx: int = -1   # slot whose upgrade popup is open, or -1
 
 ## Effects from the meta skill tree, applied at run start (GDD §7/§10).
 var _mods: RunModifiers
@@ -71,6 +72,7 @@ func _ready() -> void:
 	_hud.minion_selected.connect(_on_minion_selected)
 	_hud.start_wave_pressed.connect(_on_start_wave)
 	_hud.return_to_hub_pressed.connect(_on_return_to_hub)
+	_hud.upgrade_chosen.connect(_on_upgrade_chosen)
 
 	_populate_available_minions()
 
@@ -108,17 +110,20 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		_selected_kind = ""
 		_hud.clear_selection()
+		_close_upgrade()
 		queue_redraw()
 
 
 func _try_click(world_pos: Vector2) -> void:
 	var idx := _nearest_slot(world_pos)
 	if idx < 0:
+		_close_upgrade()   # clicked empty ground
 		return
 	if _slot_minions[idx] == null:
+		_close_upgrade()
 		_try_place(idx)
 	else:
-		_try_upgrade(idx)
+		_open_upgrade(idx)
 
 
 func _nearest_slot(world_pos: Vector2) -> int:
@@ -145,12 +150,40 @@ func _try_place(idx: int) -> void:
 	queue_redraw()
 
 
-func _try_upgrade(idx: int) -> void:
+## Opens the branch-upgrade popup for a placed minion (or hides it if the minion is maxed).
+func _open_upgrade(idx: int) -> void:
 	var minion: Minion = _slot_minions[idx]
-	if minion == null or not minion.can_upgrade():
+	if minion == null:
 		return
-	if GameState.try_spend(minion.upgrade_cost):
-		minion.apply_upgrade()
+	var options := minion.upgrade_options()
+	if options.is_empty():
+		_close_upgrade()   # maxed — nothing to offer
+		return
+	_upgrading_idx = idx
+	_hud.show_upgrades(minion.display_name, options)
+
+
+func _close_upgrade() -> void:
+	_upgrading_idx = -1
+	_hud.hide_upgrades()
+
+
+func _on_upgrade_chosen(id: String) -> void:
+	if _upgrading_idx < 0:
+		return
+	var minion: Minion = _slot_minions[_upgrading_idx]
+	if minion == null:
+		_close_upgrade()
+		return
+	var cost := minion.cost_of(id)
+	if not GameState.can_afford(cost):
+		return   # can't afford — leave the popup open
+	if not minion.apply_upgrade_choice(id):
+		return   # invalid choice — don't charge
+	GameState.try_spend(cost)
+	queue_redraw()
+	# reopen for the next tier, or close if now maxed
+	_open_upgrade(_upgrading_idx)
 
 
 # ---------------------------------------------------------------- signal handlers

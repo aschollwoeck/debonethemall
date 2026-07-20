@@ -13,15 +13,34 @@ func _ready() -> void:
 	attack_rate = 1.6
 	attack_range = 82.0
 	cost = 50
-	upgrade_cost = 55
 	projectile_color = Color("cfe8b0")
 
 
-func _attack(target: Enemy) -> void:
-	var bolt := Projectile.new()
-	bolt.setup(target, damage, damage_type, projectile_color)
-	bolt.global_position = global_position
-	get_parent().add_child(bolt)
+func _fire(target_list: Array) -> void:
+	for enemy in target_list:
+		var bolt := Projectile.new()
+		bolt.setup(enemy, damage, damage_type, projectile_color)
+		bolt.global_position = global_position
+		get_parent().add_child(bolt)
+
+
+## Volley — fire at more enemies at once (great vs. swarms) · Piercer — single-target power.
+func _branches() -> Dictionary:
+	return {
+		"a": {"name": "Volley", "cost1": 55, "cost2": 95},
+		"b": {"name": "Piercer", "cost1": 55, "cost2": 95},
+	}
+
+
+func _apply_branch(id: String, t: int) -> void:
+	if id == "a":            # Volley: +1 simultaneous target per tier
+		targets += 1
+		if t == 2:
+			damage *= 1.2
+	else:                    # Piercer: single-target burst
+		damage *= 1.8 if t == 1 else 1.6
+		if t == 2:
+			attack_range *= 1.2
 
 
 func _draw_body() -> void:

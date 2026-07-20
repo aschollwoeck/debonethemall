@@ -43,8 +43,16 @@ bone; golems shatter bone but can't pin fast targets. **Mix your builds.**
 | **Bound Wraith** | Necrotic | Medium | Necrotic bolts; the answer to ethereal foes. Unlocked via the tree. |
 
 You **start with only the Bone Archer**; the Golem and Bound Wraith are unlocked on the skill
-tree, and a run only lets you place minions you've unlocked. Each minion has **one upgrade**;
-**branching upgrades** (two specializations) arrive in M1.
+tree, and a run only lets you place minions you've unlocked.
+
+**Upgrades branch.** Click a placed minion to upgrade it — the first upgrade picks one of two
+specializations, and a second tier deepens that branch (the choice is locked once made):
+
+| Minion | Branch A | Branch B |
+|---|---|---|
+| Bone Archer | **Volley** — hits more enemies at once | **Piercer** — single-target power |
+| Bone-Mill Golem | **Wider Grind** — bigger AoE radius | **Bone Crusher** — heavier damage |
+| Bound Wraith | **Reaper** — raw necrotic damage | **Warden** — greater reach & cadence |
 
 ## Enemies
 | Enemy | Armor | Behaviour | Debone stages |
@@ -66,8 +74,9 @@ banked and try again — coming back stronger each time.
 damage, and **which minions you may place** — a run only offers the minions you've unlocked
 (you start with just the Bone Archer).
 
-*Still planned (M1):* **branching upgrades** (each minion forks into two specializations) and a
-difficulty/balance pass so a fresh save is a real challenge.
+*Balance is a work in progress:* enemies were made significantly tankier so the counter matrix
+matters (a fresh Archer-only save is meant to be a real challenge), but the numbers are a first
+pass and still being tuned by playtest.
 
 ## Controls
 **In the Crypt (Hub):**
@@ -78,7 +87,7 @@ difficulty/balance pass so a fresh save is a real challenge.
 
 **In a run:**
 - **Select a minion** (bottom-left buttons), then **click a build slot** to raise it.
-- **Click a placed minion** to buy its upgrade.
-- **Right-click** cancels the current selection.
+- **Click a placed minion** to open its upgrade choices (pick a branch, then deepen it).
+- **Right-click** cancels the current selection / closes the upgrade popup.
 - **Start Wave** (bottom-right) sends the next wave.
 - **Return to Crypt** (on the end screen) returns to the Hub.
