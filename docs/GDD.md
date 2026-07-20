@@ -353,8 +353,13 @@ cross-arc combos and the ratios, during the balance pass.
   upgrades, plus a 3rd minion (Bound Wraith / Necrotic) & enemy (Wraith / Ethereal) with
   unlock gating. Runs finite. **Full spec: [`M1-core-systems.md`](./M1-core-systems.md).**
   *(Difficulty is a first pass — final balance is pending playtest.)*
-- **M2 — Act I content:** full Act I maps, enemy roster, story delivery, the slave framing.
-- **M3+ — Acts II & III, polish, audio, balance.**
+- **▶ M2 — Visual Overhaul (NEXT):** replace placeholder programmer-art with the agreed
+  **crazy-dark** aesthetic (necrotic-green default / witchfire-purple later acts) — layered
+  background, lighting pass, shaded minions & enemies, diegetic HUD. Systems unchanged.
+  **Art bible: [`art-direction.md`](./art-direction.md) · Spec: [`M2-visual-overhaul.md`](./M2-visual-overhaul.md).**
+- **M3 — Act I content:** full Act I maps, enemy roster, story delivery, the slave framing —
+  built in the new visual style from the start.
+- **M4+ — Acts II & III, polish, audio, balance.**
 
 ---
 
