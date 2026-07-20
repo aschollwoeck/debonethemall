@@ -65,36 +65,51 @@ func _draw() -> void:
 	var hi: Color = NECRO[2].lerp(BLOOD[2], t)
 	var spark: Color = NECRO[3].lerp(BLOOD[3], t)
 
-	_draw_dais()
+	_draw_dais(spark)
 
-	# crystal floats + bobs gently above the dais
-	var c := Vector2(0, -3 + sin(_pulse) * 0.8)
-	draw_set_transform(c, 0.0, Vector2.ONE)
+	# soft emissive aura behind the crystal — a painterly core the lighting pass then blooms
+	_soft(Vector2(0, -6), 18.0, Color(hi.r, hi.g, hi.b, 0.10 + 0.06 * pulse))
+
+	# crystal floats + bobs gently above the dais, seated in the socket. Scaled up (§0 restyle)
+	# for presence; the whole crystal draws in this scaled local frame.
+	var c := Vector2(0, -5 + sin(_pulse) * 0.8)
+	draw_set_transform(c, 0.0, Vector2(1.3, 1.3))
 	# facets: left (dark) · right (mid) · centre highlight sliver · top glint
 	draw_colored_polygon(PackedVector2Array([APEX, Vector2(-6, -4), Vector2(-5, 4), Vector2(0, 10)]), lo)
 	draw_colored_polygon(PackedVector2Array([APEX, Vector2(6, -4), Vector2(5, 4), Vector2(0, 10)]), mid)
 	draw_colored_polygon(PackedVector2Array([APEX, Vector2(-1.5, -3), Vector2(0, 10), Vector2(1.5, -3)]), hi)
 	draw_colored_polygon(PackedVector2Array([APEX, Vector2(-3, -6), Vector2(3, -6)]), hi.lerp(spark, 0.5))
-	# revealed cracks
+	# revealed cracks (antialiased hairlines)
 	var shown := int(round(t * _cracks.size()))
 	for i in shown:
-		draw_polyline(_cracks[i], Color(0.02, 0.02, 0.03, 0.9), 1.0)
+		draw_polyline(_cracks[i], Color(0.02, 0.02, 0.03, 0.9), 0.8, true)
 	# outline + inner spark
-	draw_polyline(_sil + PackedVector2Array([APEX]), Color(spark.r, spark.g, spark.b, 0.5 + 0.4 * pulse), 1.0)
+	draw_polyline(_sil + PackedVector2Array([APEX]), Color(spark.r, spark.g, spark.b, 0.5 + 0.4 * pulse), 0.8, true)
 	draw_circle(Vector2(0, -1), 1.6 + 0.6 * pulse, Color(spark.r, spark.g, spark.b, 0.7 + 0.3 * pulse))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
-func _draw_dais() -> void:
-	draw_circle(Vector2(0, 13), 15.0, Color(0, 0, 0, 0.4))            # shadow
-	_ellipse(Vector2(0, 11), 14.0, 5.5, STONE_DARK)                   # base
-	_ellipse(Vector2(0, 9), 12.0, 4.5, STONE_RIM)                     # rim
-	_ellipse(Vector2(0, 9), 8.5, 3.0, STONE_LIT)                      # lit inner
-	_ellipse(Vector2(0, 9), 5.0, 1.8, STONE_DARK)                    # socket the crystal sits in
-	for i in 4:                                                        # rune ticks on the rim
-		var a := PI + i * PI / 3.0
-		var p := Vector2(cos(a) * 12.0, 9.0 + sin(a) * 4.0)
-		draw_rect(Rect2(p.x - 1, p.y - 1, 2, 2), RUNE)
+func _draw_dais(spark: Color) -> void:
+	draw_circle(Vector2(0, 14), 16.0, Color(0, 0, 0, 0.4))            # soft shadow
+	_ellipse(Vector2(0, 12), 15.0, 6.0, STONE_DARK)                  # base
+	_ellipse(Vector2(0, 10), 13.0, 4.8, STONE_RIM)                  # rim
+	_ellipse(Vector2(0, 10), 9.0, 3.2, STONE_LIT)                   # lit inner
+	# the crystal's light catching the stone around the socket
+	_ellipse(Vector2(0, 9), 6.0, 2.2, Color(spark.r, spark.g, spark.b, 0.12))
+	_ellipse(Vector2(0, 9), 5.0, 1.8, STONE_DARK)                   # socket the crystal sits in
+	# rune-etched ring: a faint accent circle + smooth rune glyphs on the rim
+	draw_arc(Vector2(0, 10), 11.0, 0, TAU, 40, Color(RUNE.r, RUNE.g, RUNE.b, 0.18), 1.0, true)
+	for i in 6:
+		var a := PI + i * TAU / 6.0
+		var p := Vector2(cos(a) * 11.5, 10.0 + sin(a) * 4.2)
+		draw_circle(p, 0.9, Color(RUNE.r, RUNE.g, RUNE.b, 0.7))
+
+
+## A soft filled glow (layered translucent circles → radial-gradient feel) for the crystal aura.
+func _soft(c: Vector2, r: float, col: Color) -> void:
+	for i in 4:
+		var k := i / 4.0
+		draw_circle(c, r * (1.0 - k * 0.6), Color(col.r, col.g, col.b, col.a * (0.35 + k * 0.25)))
 
 
 func _ellipse(center: Vector2, rx: float, ry: float, col: Color) -> void:
