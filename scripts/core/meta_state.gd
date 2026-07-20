@@ -2,8 +2,8 @@ extends Node
 ## Autoload singleton (MetaState).
 ##
 ## Persistent, cross-run state saved to disk (GDD §5/§10): the harvested **Grave Bones**
-## currency and the set of unlocked skill-tree nodes. Loaded on boot; saved explicitly
-## (autosave on run-end and tree purchases, wired by later M1 features).
+## currency and the set of unlocked skill-tree nodes. Loaded on boot; autosaved on run-end
+## (`main._finish_run`) and on tree purchases (the Hub).
 ##
 ## Distinct from GameState, which holds run-scoped Bone Dust that resets each run.
 

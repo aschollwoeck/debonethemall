@@ -1,13 +1,14 @@
 extends Node
 class_name WaveManager
-## Drives the scripted M0 wave sequence: spawns enemies along the path on a schedule, wires
-## each enemy's death (→ Bone Dust) and leak (→ phylactery damage), and reports when a wave
-## is cleared and when all waves are done.
+## Drives the scripted wave sequence: spawns enemies along the path on a schedule, wires each
+## enemy's death (→ Bone Dust + Grave Bones harvest) and leak (→ phylactery damage), and
+## reports when a wave is cleared and when all waves are done.
 
 signal wave_started(index: int, total: int)
 signal wave_cleared(index: int)
 signal all_waves_cleared
 signal enemy_count_changed(alive: int)
+signal harvest_changed(total: int)
 
 const GRUNT := preload("res://scripts/enemies/skeleton_grunt.gd")
 const DOG := preload("res://scripts/enemies/skeletal_dog.gd")
@@ -35,12 +36,23 @@ var _schedule: Array = []      # sorted [{time, script}]
 var _elapsed: float = 0.0
 var _spawned: int = 0
 var _alive: int = 0
+var _harvest: int = 0          # Grave Bones harvested from kills this run
 
 
 func setup(path_points: PackedVector2Array, spawn_parent: Node, phylactery: Phylactery) -> void:
 	_path = path_points
 	_spawn_parent = spawn_parent
 	_phylactery = phylactery
+
+
+## Total Grave Bones harvested from kills so far this run.
+func total_harvest() -> int:
+	return _harvest
+
+
+## Halts spawning and wave progression (called when the run ends).
+func stop() -> void:
+	_active = false
 
 
 func total_waves() -> int:
@@ -110,8 +122,10 @@ func _spawn(enemy_script: Script) -> void:
 	enemy_count_changed.emit(_alive)
 
 
-func _on_enemy_died(reward: int, _at: Vector2) -> void:
-	GameState.add(reward)
+func _on_enemy_died(reward: int, bones: int) -> void:
+	GameState.add(reward)          # in-run Bone Dust
+	_harvest += bones              # meta Grave Bones harvest (banked at run end)
+	harvest_changed.emit(_harvest)
 	_dec_alive()
 
 

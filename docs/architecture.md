@@ -39,8 +39,8 @@ docs/                          — design + technical + player docs
 - **`GameState`** — in-run currency (Bone Dust) with a `bone_dust_changed` signal. Run-scoped;
   resets each run.
 - **`MetaState`** — **persistent** cross-run state saved to `user://save.json`: Grave Bones
-  currency + the unlocked skill-tree node set. Loaded on boot; saved explicitly via `save_game()`
-  (run-end / purchase autosave hooks land in later M1 features). Path-injectable
+  currency + the unlocked skill-tree node set. Loaded on boot; autosaved via `save_game()` on
+  run-end (`main._finish_run`) and on tree purchases (the Hub). Path-injectable
   `save_to()`/`load_from()` keep tests off the real save. `bank_harvest(base, cleared)` applies
   the success multiplier on a clear.
 - **`SkillTree`** — data-driven meta skill tree (GDD §7/§10). Holds node definitions (`NODES`:
@@ -48,11 +48,21 @@ docs/                          — design + technical + player docs
   aggregates unlocked nodes into a `RunModifiers` (unlocked minions + global buffs) that a run
   reads at start via `build_run_modifiers()`. Has no UI of its own — the Hub renders it.
 
-## Scene flow
+## Scene flow & the meta loop
 `hub.tscn` (entry) → **Begin Run** → `change_scene_to_file(main.tscn)` (a run) → win/lose →
 **Return to Crypt** → back to `hub.tscn`. Autoloads (`MetaState`, `SkillTree`, …) persist across
-these scene changes, so meta progress carries over. Applying the tree's `RunModifiers` to a run
-and banking harvest on run-end are wired by later M1 features.
+these scene changes, so meta progress carries over.
+
+The full loop is closed:
+- **Run start:** `main.gd` reads `SkillTree.build_run_modifiers()` and applies the buffs —
+  +phylactery max life, +starting Bone Dust, ×minion-damage (applied per minion at placement).
+- **During the run:** each kill adds to `WaveManager`'s Grave Bones harvest (`harvest_changed`
+  → HUD readout), alongside the in-run Bone Dust reward.
+- **Run end (win or lose):** `_finish_run()` banks the harvest via `MetaState.bank_harvest()`
+  (×1.5 on a clear), autosaves, and shows the banked total on the end screen.
+
+Not yet wired (later M1): minion-unlock *gating* (the run doesn't yet restrict placement to
+`RunModifiers.unlocked_minions`) and the third minion/enemy.
 
 ## Core patterns
 - **Container UI vs. absolute UI:** the **Hub** uses Godot container nodes (`MarginContainer` /
@@ -74,8 +84,8 @@ and banking harvest on run-end are wired by later M1 features.
 ## Combat flow (one hit)
 `Minion._attack()` → `Projectile` (or AoE) → `Enemy.take_damage(base, type)` →
 `CombatTypes.resolve_damage(base, type, armor)` → HP drop → `_update_stage()` crosses a debone
-threshold (visual/behaviour change) → death (`died` → Bone Dust) or leak (`reached_end` →
-phylactery damage).
+threshold (visual/behaviour change) → death (`died` → Bone Dust + Grave Bones harvest) or leak
+(`reached_end` → phylactery damage).
 
 ## Testing entry points
 - `./run_tests.sh` runs GUT headless over `tests/unit/`.

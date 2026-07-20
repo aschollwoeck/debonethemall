@@ -31,12 +31,22 @@ var _hud: HUD
 var _selected_kind: String = ""
 var _game_over: bool = false
 
+## Effects from the meta skill tree, applied at run start (GDD §7/§10).
+var _mods: RunModifiers
+var _damage_mult: float = 1.0
+
 
 func _ready() -> void:
 	_slot_minions.resize(_slots.size())
+	_mods = SkillTree.build_run_modifiers()
+	_damage_mult = _mods.minion_damage_mult
+
+	# Apply meta buffs: starting Bone Dust bonus on top of the base.
 	GameState.reset_run()
+	GameState.add(_mods.starting_dust_bonus)
 
 	_phylactery = Phylactery.new()
+	_phylactery.max_life += _mods.phylactery_bonus   # before add_child, so _ready sets life correctly
 	_phylactery.global_position = _path[_path.size() - 1]
 	_phylactery.life_changed.connect(_on_life_changed)
 	_phylactery.destroyed.connect(_on_phylactery_destroyed)
@@ -48,6 +58,7 @@ func _ready() -> void:
 	_waves.wave_started.connect(_on_wave_started)
 	_waves.wave_cleared.connect(_on_wave_cleared)
 	_waves.all_waves_cleared.connect(_on_all_cleared)
+	_waves.harvest_changed.connect(_on_harvest_changed)
 
 	_hud = HUD.new()
 	add_child(_hud)
@@ -58,6 +69,7 @@ func _ready() -> void:
 	GameState.bone_dust_changed.connect(_on_dust_changed)
 	_on_dust_changed(GameState.bone_dust)
 	_on_life_changed(_phylactery.life, _phylactery.max_life)
+	_on_harvest_changed(0)
 	_update_wave_hud()
 	queue_redraw()
 
@@ -97,11 +109,14 @@ func _try_place(idx: int) -> void:
 		return
 	var script: Script = ARCHER if _selected_kind == HUD.ARCHER else GOLEM
 	var minion: Minion = script.new()
-	if not GameState.try_spend(minion.cost):
-		minion.free()
-		return
-	minion.global_position = _slots[idx]
+	# Subclasses set their stats (cost, damage, …) in _ready(), which fires synchronously on
+	# add_child — so cost/damage must be read and the buff applied AFTER mounting, not before.
 	add_child(minion)
+	if not GameState.try_spend(minion.cost):
+		minion.queue_free()   # can't afford — un-place
+		return
+	minion.damage *= _damage_mult   # meta damage buff, applied after _ready set the base
+	minion.global_position = _slots[idx]
 	_slot_minions[idx] = minion
 	queue_redraw()
 
@@ -140,6 +155,10 @@ func _on_life_changed(current: int, max_life: int) -> void:
 	_hud.set_life(current, max_life)
 
 
+func _on_harvest_changed(total: int) -> void:
+	_hud.set_harvest(total)
+
+
 func _on_wave_started(_index: int, _total: int) -> void:
 	_update_wave_hud()
 
@@ -149,18 +168,25 @@ func _on_wave_cleared(_index: int) -> void:
 
 
 func _on_all_cleared() -> void:
-	if _game_over:
-		return
-	_game_over = true
-	_hud.show_end(true)
+	_finish_run(true)
 
 
 func _on_phylactery_destroyed() -> void:
+	if not _game_over:
+		get_tree().call_group("enemies", "queue_free")
+	_finish_run(false)
+
+
+## Ends the run once: banks the harvested Grave Bones (×multiplier on a clear), saves, and
+## shows the end screen. Harvest is kept whether you win or lose (GDD §5).
+func _finish_run(cleared: bool) -> void:
 	if _game_over:
 		return
 	_game_over = true
-	_hud.show_end(false)
-	get_tree().call_group("enemies", "queue_free")
+	_waves.stop()   # no more spawns behind the end panel
+	var banked := MetaState.bank_harvest(_waves.total_harvest(), cleared)
+	MetaState.save_game()
+	_hud.show_end(cleared, banked)
 
 
 func _update_wave_hud() -> void:

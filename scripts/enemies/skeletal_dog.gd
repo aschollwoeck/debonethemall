@@ -11,6 +11,7 @@ func _ready() -> void:
 	armor_type = CombatTypes.Armor.UNARMORED
 	move_speed = 66.0
 	reward = 6
+	bones_harvest = 1
 	leak_damage = 1
 	stage_thresholds = [0.5]              # two stages: whole → split
 	stage_speed_mult = [1.0, 1.15]        # split halves keep sliding on momentum

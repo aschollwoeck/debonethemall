@@ -11,6 +11,7 @@ func _ready() -> void:
 	armor_type = CombatTypes.Armor.BONE
 	move_speed = 34.0
 	reward = 8
+	bones_harvest = 2
 	leak_damage = 1
 	stage_thresholds = [0.66, 0.33]
 	stage_speed_mult = [1.0, 0.6, 0.45]   # loses legs → crawls slower (mechanical debone)
