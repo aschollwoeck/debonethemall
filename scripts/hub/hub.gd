@@ -2,10 +2,11 @@ extends Control
 ## Hub scene ("The Crypt") — the meta screen and the game's entry point (GDD §5/§10).
 ##
 ## The skill tree is a **necromantic sigil** (art-direction §10): a central glowing skull-core with
-## vein-branches radiating to the route nodes, concentric sigil rings framing it. Node states read
-## at a glance — owned (accent glow), available (amber pulse), locked (dim behind its gate), or
-## met-but-unaffordable (amber dim). Veins light up as a branch is unlocked. Custom-drawn smooth
-## (the UI is the smooth layer); clicking an available node buys it via SkillTree and autosaves.
+## vein-branches radiating to the route nodes, concentric sigil rings framing it. Each node is a
+## compact **rectangular card** (cost, or a gem when owned); states read at a glance — owned
+## (accent glow), available (amber pulse), locked (dim behind its gate), or met-but-unaffordable
+## (amber dim). Veins light up as a branch is unlocked. Custom-drawn smooth (the UI is the smooth
+## layer); hovering a card shows its name/description, and clicking an available card buys it.
 ##
 ## Buying/routing/currency all go through SkillTree + MetaState (unchanged); this file only changes
 ## how the tree is presented and how nodes are picked.
@@ -25,8 +26,8 @@ const ROUTES := [
 # --- sigil geometry (logical 480×270 space) ---
 const CENTER := Vector2(240, 146)
 const R_INNER := 44.0
-const R_OUTER := 82.0
-const NODE_R := 8.5
+const R_OUTER := 88.0
+const CARD := Vector2(40, 20)   # compact rectangular node
 
 # --- palette (art-direction §3) ---
 const ACCENT := Color(0.39, 0.89, 0.60)   # necrotic — owned / lit veins / core
@@ -49,7 +50,7 @@ func _ready() -> void:
 	_refresh()
 
 
-## Precomputes each node's position on its spoke (done once; states are read live in _draw).
+## Precomputes each node's card centre on its spoke (done once; states are read live in _draw).
 func _build_sigil() -> void:
 	_sigil_nodes.clear()
 	for i in ROUTES.size():
@@ -68,7 +69,6 @@ func _build_chrome() -> void:
 	var title := _label("THE CRYPT", 18, BONE, Vector2(14, 8))
 	title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
 	title.add_theme_constant_override("outline_size", 3)
-	_label("Spend Grave Bones on the sigil, then rise.", 9, DIMV.lerp(BONE, 0.4), Vector2(15, 32))
 
 	_balance_label = _label("", 12, ACCENT, Vector2(346, 12))
 	_balance_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
@@ -77,8 +77,8 @@ func _build_chrome() -> void:
 	var begin := Button.new()
 	begin.text = "Begin Run  ›"
 	begin.focus_mode = Control.FOCUS_NONE
-	begin.position = Vector2(186, 244)
-	begin.custom_minimum_size = Vector2(108, 20)
+	begin.position = Vector2(186, 246)
+	begin.custom_minimum_size = Vector2(108, 18)
 	begin.add_theme_font_size_override("font_size", 12)
 	begin.add_theme_color_override("font_color", BONE)
 	begin.add_theme_color_override("font_hover_color", Color.WHITE)
@@ -140,20 +140,20 @@ func _draw() -> void:
 		var outer: Vector2 = CENTER + dir * R_OUTER
 		_vein(CENTER + dir * 14.0, inner, _vein_color(ROUTES[i]["nodes"][0]))
 		_vein(inner, outer, _vein_color(ROUTES[i]["nodes"][1]))
-	# route titles just past each outer node, aligned outward so they never overlap the node/cost
+	# route titles just past each outer card, aligned outward so they never overlap a card
 	var font := get_theme_default_font()
 	for i in ROUTES.size():
 		var ang := -PI / 2.0 + i * TAU / ROUTES.size()
 		var dir := Vector2(cos(ang), sin(ang))
 		var title: String = ROUTES[i]["title"]
 		var tw := font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x
-		var tp: Vector2 = CENTER + dir * (R_OUTER + NODE_R + 7.0) + Vector2(0, 3)
+		var tp: Vector2 = CENTER + dir * (R_OUTER + 24.0) + Vector2(0, 3)
 		if dir.x < -0.3:
-			tp.x -= tw                    # left spoke: text ends at the node, extends outward
+			tp.x -= tw                    # left spoke: text ends at the card, extends outward
 		elif dir.x <= 0.3:
 			tp.x -= tw / 2.0              # top/bottom spoke: centre
 		draw_string(font, tp, title, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, DIMV.lerp(BONE, 0.45))
-	# nodes
+	# node cards
 	for n in _sigil_nodes:
 		_draw_node(n, font)
 	# core + hovered info card (on top)
@@ -193,40 +193,43 @@ func _node_state(id: String) -> String:
 	return "locked"
 
 
+## A compact rectangular card: cost when buyable, a gem when owned, dim when locked.
 func _draw_node(n: Dictionary, font: Font) -> void:
 	var pos: Vector2 = n["pos"]
 	var st := _node_state(n["id"])
+	var rect := Rect2(pos - CARD * 0.5, CARD)
 	var pulse := 0.5 + 0.5 * sin(_t * 3.0)
+	var bg := VOID
+	var border: Color
+	var txt := str(int(SkillTree.get_node_def(n["id"]).get("cost", 0)))
+	var txt_col := BONE
 	match st:
 		"owned":
-			_glow(pos, 15.0, ACCENT, 0.5)
-			draw_circle(pos, NODE_R, Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.85))
-			draw_arc(pos, NODE_R, 0.0, TAU, 28, Color.WHITE.lerp(ACCENT, 0.5), 1.5, true)
-			draw_circle(pos, 2.4, VOID)
+			_glow(pos, 15.0, ACCENT, 0.45)
+			bg = Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.22)
+			border = Color.WHITE.lerp(ACCENT, 0.5)
+			txt = ""   # the green gem conveys ownership
 		"avail":
-			_glow(pos, 13.0, AMBER, 0.18 + 0.16 * pulse)
-			draw_circle(pos, NODE_R, VOID)
-			draw_arc(pos, NODE_R, 0.0, TAU, 28, Color(AMBER.r, AMBER.g, AMBER.b, 0.55 + 0.45 * pulse), 1.5, true)
-			draw_circle(pos, 2.2, Color(AMBER.r, AMBER.g, AMBER.b, 0.9))
-			_cost_label(pos, n["id"], AMBER, font)
+			_glow(pos, 12.0, AMBER, 0.14 + 0.14 * pulse)
+			border = Color(AMBER.r, AMBER.g, AMBER.b, 0.55 + 0.45 * pulse)
+			txt_col = AMBER
 		"poor":
-			draw_circle(pos, NODE_R, VOID)
-			draw_arc(pos, NODE_R, 0.0, TAU, 28, Color(AMBER.r, AMBER.g, AMBER.b, 0.34), 1.0, true)
-			draw_circle(pos, 2.0, Color(AMBER.r, AMBER.g, AMBER.b, 0.5))
-			_cost_label(pos, n["id"], Color(AMBER.r, AMBER.g, AMBER.b, 0.55), font)
+			border = Color(AMBER.r, AMBER.g, AMBER.b, 0.34)
+			txt_col = Color(AMBER.r, AMBER.g, AMBER.b, 0.55)
 		_:
-			draw_circle(pos, NODE_R, Color(VOID.r, VOID.g, VOID.b, 0.85))
-			draw_arc(pos, NODE_R, 0.0, TAU, 28, Color(DIMV.r, DIMV.g, DIMV.b, 0.5), 1.0, true)
-			draw_circle(pos, 2.0, Color(DIMV.r, DIMV.g, DIMV.b, 0.6))
+			bg = Color(VOID.r, VOID.g, VOID.b, 0.85)
+			border = Color(DIMV.r, DIMV.g, DIMV.b, 0.5)
+			txt = ""
+	draw_rect(rect, bg)
+	draw_rect(rect, border, false, 1.0)
 	if _hover == n["id"] and st != "locked":
-		draw_arc(pos, NODE_R + 2.5, 0.0, TAU, 30, Color(1, 1, 1, 0.5), 1.0, true)
-
-
-func _cost_label(pos: Vector2, id: String, col: Color, font: Font) -> void:
-	var cost := int(SkillTree.get_node_def(id).get("cost", 0))
-	var txt := str(cost)
-	var w := font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
-	draw_string(font, pos + Vector2(-w / 2.0, NODE_R + 9.0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, col)
+		draw_rect(rect.grow(2.0), Color(1, 1, 1, 0.5), false, 1.0)
+	if st == "owned":
+		draw_circle(pos, 3.2, VOID)
+		draw_circle(pos, 1.6, Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.9))
+	elif txt != "":
+		var sz := font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 10)
+		draw_string(font, pos + Vector2(-sz.x / 2.0, 3.5), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, txt_col)
 
 
 func _glow(pos: Vector2, r: float, col: Color, intensity: float) -> void:
@@ -238,24 +241,24 @@ func _glow(pos: Vector2, r: float, col: Color, intensity: float) -> void:
 ## The central skull-core: a dark cranium with an accent rim, glowing eyes, a hint of jaw.
 func _draw_core() -> void:
 	var pulse := 0.5 + 0.5 * sin(_t * 2.0)
-	_glow(CENTER, 24.0, ACCENT, 0.28 + 0.10 * pulse)
+	_glow(CENTER, 22.0, ACCENT, 0.26 + 0.10 * pulse)
 	# cranium
-	draw_circle(CENTER, 12.0, Color(0.08, 0.07, 0.11))
-	draw_arc(CENTER, 12.0, PI, TAU, 24, Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.75), 1.5, true)
+	draw_circle(CENTER, 11.0, Color(0.08, 0.07, 0.11))
+	draw_arc(CENTER, 11.0, PI, TAU, 24, Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.75), 1.5, true)
 	# jaw
-	draw_rect(Rect2(CENTER.x - 5.0, CENTER.y + 8.0, 10.0, 5.0), Color(0.08, 0.07, 0.11))
-	draw_rect(Rect2(CENTER.x - 5.0, CENTER.y + 8.0, 10.0, 5.0), Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.5), false, 1.0)
-	for tx in [-3.0, 0.0, 3.0]:
-		draw_line(CENTER + Vector2(tx, 8.0), CENTER + Vector2(tx, 13.0), Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.3), 1.0)
+	draw_rect(Rect2(CENTER.x - 4.5, CENTER.y + 7.0, 9.0, 5.0), Color(0.08, 0.07, 0.11))
+	draw_rect(Rect2(CENTER.x - 4.5, CENTER.y + 7.0, 9.0, 5.0), Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.5), false, 1.0)
+	for tx in [-2.5, 0.0, 2.5]:
+		draw_line(CENTER + Vector2(tx, 7.0), CENTER + Vector2(tx, 12.0), Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.3), 1.0)
 	# glowing eye sockets
 	var eye := Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.8 + 0.2 * pulse)
-	_glow(CENTER + Vector2(-4.0, -1.0), 5.0, ACCENT, 0.5)
-	_glow(CENTER + Vector2(4.0, -1.0), 5.0, ACCENT, 0.5)
-	draw_circle(CENTER + Vector2(-4.0, -1.0), 2.2, eye)
-	draw_circle(CENTER + Vector2(4.0, -1.0), 2.2, eye)
+	_glow(CENTER + Vector2(-3.5, -1.0), 4.5, ACCENT, 0.5)
+	_glow(CENTER + Vector2(3.5, -1.0), 4.5, ACCENT, 0.5)
+	draw_circle(CENTER + Vector2(-3.5, -1.0), 2.0, eye)
+	draw_circle(CENTER + Vector2(3.5, -1.0), 2.0, eye)
 	# nasal
-	draw_colored_polygon(PackedVector2Array([CENTER + Vector2(0, 2), CENTER + Vector2(-1.4, 6),
-		CENTER + Vector2(1.4, 6)]), Color(0.05, 0.04, 0.08))
+	draw_colored_polygon(PackedVector2Array([CENTER + Vector2(0, 1.5), CENTER + Vector2(-1.3, 5.0),
+		CENTER + Vector2(1.3, 5.0)]), Color(0.05, 0.04, 0.08))
 
 
 ## A small floating card with the hovered node's name, status and description.
@@ -269,10 +272,10 @@ func _draw_info_card(id: String, font: Font) -> void:
 		status = "Locked — needs its prerequisite"
 	var status_col := ACCENT if st == "owned" else (AMBER if st != "locked" else DIMV)
 	var card := Vector2(154, 54)
-	# anchor beside the hovered node, clamped on-screen
-	var pos := _node_pos(id) + Vector2(14, -card.y / 2.0)
+	# anchor beside the hovered card, clamped on-screen
+	var pos := _node_pos(id) + Vector2(CARD.x * 0.5 + 6.0, -card.y / 2.0)
 	pos.x = clampf(pos.x, 6.0, 480.0 - card.x - 6.0)
-	pos.y = clampf(pos.y, 44.0, 270.0 - card.y - 26.0)
+	pos.y = clampf(pos.y, 40.0, 270.0 - card.y - 26.0)
 	draw_rect(Rect2(pos, card), Color(0.035, 0.03, 0.07, 0.97))
 	draw_rect(Rect2(pos, card), HAIR, false, 1.0)
 	draw_string(font, pos + Vector2(8, 15), node_name, HORIZONTAL_ALIGNMENT_LEFT, card.x - 16, 9, BONE)
@@ -295,10 +298,10 @@ func _gui_input(event: InputEvent) -> void:
 			_on_buy(id)
 
 
-## The node id whose disc contains `p` (local coords), or "" if none.
+## The node id whose card contains `p` (local coords), or "" if none.
 func _node_at(p: Vector2) -> String:
 	for n in _sigil_nodes:
-		if p.distance_to(n["pos"]) <= NODE_R + 2.0:
+		if Rect2(n["pos"] - CARD * 0.5, CARD).has_point(p):
 			return n["id"]
 	return ""
 
