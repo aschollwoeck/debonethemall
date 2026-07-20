@@ -16,6 +16,7 @@ systems are added or reshaped.
 scripts/
   combat/   combat_types.gd   — CombatTypes autoload: damage/armor enums + counter matrix
   core/     game_state.gd      — GameState autoload: in-run Bone Dust economy
+            meta_state.gd      — MetaState autoload: persistent cross-run save (Grave Bones + unlocks)
             phylactery.gd      — the objective enemies attack
             wave_manager.gd    — scripted wave spawning + enemy signal wiring
   enemies/  enemy.gd (base) + skeleton_grunt.gd, skeletal_dog.gd
@@ -32,7 +33,12 @@ docs/                          — design + technical + player docs
 - **`CombatTypes`** — `Damage`/`Armor` enums, the `MATRIX`, and `resolve_damage()`. The one
   place the tactical rock-paper-scissors is defined. Tune balance here.
 - **`GameState`** — in-run currency (Bone Dust) with a `bone_dust_changed` signal. Run-scoped;
-  resets each run. (Persistent meta state arrives in M1 as a separate `MetaState`.)
+  resets each run.
+- **`MetaState`** — **persistent** cross-run state saved to `user://save.json`: Grave Bones
+  currency + the unlocked skill-tree node set. Loaded on boot; saved explicitly via `save_game()`
+  (run-end / purchase autosave hooks land in later M1 features). Path-injectable
+  `save_to()`/`load_from()` keep tests off the real save. `bank_harvest(base, cleared)` applies
+  the success multiplier on a clear.
 
 ## Core patterns
 - **Code-driven world:** `main.gd` builds the path, phylactery, build slots, wave manager, and
@@ -55,7 +61,7 @@ phylactery damage).
 
 ## Testing entry points
 - `./run_tests.sh` runs GUT headless over `tests/unit/`.
-- Pure-logic autoloads (`CombatTypes`, `GameState`) are directly unit-testable; see
+- Pure-logic autoloads (`CombatTypes`, `GameState`, `MetaState`) are directly unit-testable; see
   `tests/unit/`.
 
 ---

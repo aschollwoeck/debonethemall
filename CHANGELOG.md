@@ -5,6 +5,9 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Added
+- **M1 · MetaState** — persistent `MetaState` autoload: Grave Bones currency, unlocked-node
+  set, and save/load to `user://save.json` (with a success multiplier on run clears). Unit
+  tests cover currency ops, harvest banking, unlocks, and save/load round-trips.
 - **Engineering foundation:** GUT test framework (`addons/gut/`), first unit tests for the
   counter matrix and economy, `./run_tests.sh` runner.
 - **Docs:** development workflow, architecture overview, player-facing mechanics reference,

@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 CombatTypes="*res://scripts/combat/combat_types.gd"
 GameState="*res://scripts/core/game_state.gd"
+MetaState="*res://scripts/core/meta_state.gd"
 
 [display]
 
