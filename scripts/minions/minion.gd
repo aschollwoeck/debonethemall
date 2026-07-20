@@ -21,8 +21,26 @@ class_name Minion
 var branch: String = ""
 var tier: int = 0
 
+## Pixel-art body (docs/art-direction.md §0/§6): the unit is the only pixelated layer. Subclasses
+## author fine pixel art via `_author_body()`; it's drawn NEAREST-filtered and upscaled by
+## `BODY_SCALE` logical px per texel, feet seated on the (smooth) plot at `FEET_Y`.
+## logical px per source texel → ~2× the old build's linear density. This 0.5 blit path
+## deliberately diverges from PixelArt.sprite()'s whole-number-scale rule: minions are static, so
+## the sub-integer factor introduces no motion shimmer, and authoring at 2× texel density is how we
+## get the "more pixels per unit" fine grid (art-direction §0/§6).
+const BODY_SCALE := 0.5
+const FEET_Y := 7.0         # where the sprite's feet meet the plot
+
 var _cooldown: float = 0.0
 var _show_range: bool = false
+var _body_tex: Texture2D = null
+var _body_built: bool = false
+
+
+func _enter_tree() -> void:
+	# Units are the pixel layer on the smooth world: sample the body texture NEAREST so it stays
+	# crisp. Only textured draws are affected — the plot/range/pips are geometry and stay smooth.
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 
 func _physics_process(delta: float) -> void:
@@ -140,6 +158,22 @@ func _ellipse(c: Vector2, rx: float, ry: float, col: Color) -> void:
 	draw_colored_polygon(pts, col)
 
 
-## Override in subclasses to render the minion (above the plot; origin at its base).
+## Blits the pixel-art body (authored once by `_author_body()`) NEAREST-filtered and upscaled,
+## feet seated on the plot. The world/UI stay smooth; only this textured draw is pixelated.
 func _draw_body() -> void:
-	draw_circle(Vector2(0, -6), 6.0, Color.WHITE)
+	if not _body_built:
+		_body_built = true
+		var img := _author_body()
+		if img != null:
+			_body_tex = ImageTexture.create_from_image(img)
+	if _body_tex == null:
+		return
+	var w := _body_tex.get_width() * BODY_SCALE
+	var h := _body_tex.get_height() * BODY_SCALE
+	draw_texture_rect(_body_tex, Rect2(-w / 2.0, FEET_Y - h, w, h), false)
+
+
+## Override in subclasses: author the unit's fine pixel art into an Image (feet at bottom-centre;
+## drawn at `BODY_SCALE`). Returning null draws nothing.
+func _author_body() -> Image:
+	return null

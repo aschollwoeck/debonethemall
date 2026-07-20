@@ -37,6 +37,27 @@ static func vline(img: Image, x: int, y: int, h: int, col: Color) -> void:
 	img.fill_rect(Rect2i(x, y, 1, h), col)
 
 
+## A 1px Bresenham line between two points — for diagonals (bows, chains, shroud edges).
+## Axis-aligned runs still prefer hline/vline.
+static func line(img: Image, x0: int, y0: int, x1: int, y1: int, col: Color) -> void:
+	var dx := absi(x1 - x0)
+	var dy := -absi(y1 - y0)
+	var sx := 1 if x0 < x1 else -1
+	var sy := 1 if y0 < y1 else -1
+	var err := dx + dy
+	while true:
+		px(img, x0, y0, col)
+		if x0 == x1 and y0 == y1:
+			break
+		var e2 := 2 * err
+		if e2 >= dy:
+			err += dy
+			x0 += sx
+		if e2 <= dx:
+			err += dx
+			y0 += sy
+
+
 ## A NEAREST-filtered Sprite2D from pixel art, upscaled by `scale`. Origin sits at the art's
 ## bottom-centre (feet), matching how units are positioned by their base.
 ## Pass a **whole-number** `scale` (uneven scales shimmer under NEAREST), and prefer **even
