@@ -12,18 +12,22 @@ signal harvest_changed(total: int)
 
 const GRUNT := preload("res://scripts/enemies/skeleton_grunt.gd")
 const DOG := preload("res://scripts/enemies/skeletal_dog.gd")
+const WRAITH := preload("res://scripts/enemies/wraith.gd")
 
 ## Each wave is a list of groups: {script, count, interval, delay}.
-## Mixed grunts (want Blunt) and dogs (want Pierce) so neither minion alone suffices.
+## Grunts want Blunt, dogs want Pierce, wraiths want Necrotic — no single minion answers all.
+## (Final difficulty tuning is the M1-F6 balance pass.)
 var _waves := [
 	[ {"script": GRUNT, "count": 5, "interval": 0.9, "delay": 0.0} ],
 	[ {"script": DOG, "count": 5, "interval": 0.6, "delay": 0.0} ],
 	[ {"script": GRUNT, "count": 6, "interval": 0.8, "delay": 0.0},
 	  {"script": DOG, "count": 3, "interval": 0.7, "delay": 3.0} ],
 	[ {"script": DOG, "count": 7, "interval": 0.45, "delay": 0.0},
-	  {"script": GRUNT, "count": 5, "interval": 0.9, "delay": 1.5} ],
+	  {"script": GRUNT, "count": 5, "interval": 0.9, "delay": 1.5},
+	  {"script": WRAITH, "count": 2, "interval": 1.5, "delay": 5.0} ],
 	[ {"script": GRUNT, "count": 10, "interval": 0.6, "delay": 0.0},
-	  {"script": DOG, "count": 8, "interval": 0.4, "delay": 2.0} ],
+	  {"script": DOG, "count": 8, "interval": 0.4, "delay": 2.0},
+	  {"script": WRAITH, "count": 4, "interval": 1.2, "delay": 4.0} ],
 ]
 
 var _path: PackedVector2Array

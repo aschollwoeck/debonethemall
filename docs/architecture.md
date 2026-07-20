@@ -19,8 +19,8 @@ scripts/
             meta_state.gd      — MetaState autoload: persistent cross-run save (Grave Bones + unlocks)
             phylactery.gd      — the objective enemies attack
             wave_manager.gd    — scripted wave spawning + enemy signal wiring
-  enemies/  enemy.gd (base) + skeleton_grunt.gd, skeletal_dog.gd
-  minions/  minion.gd (base) + bone_archer.gd, bone_mill_golem.gd, projectile.gd
+  enemies/  enemy.gd (base) + skeleton_grunt.gd, skeletal_dog.gd, wraith.gd
+  minions/  minion.gd (base) + bone_archer.gd, bone_mill_golem.gd, bound_wraith.gd, projectile.gd
   meta/     skill_tree.gd      — SkillTree autoload: node data, purchase, run-modifier aggregation
             run_modifiers.gd   — RunModifiers value object (aggregated tree effects for a run)
   ui/       hud.gd             — code-built HUD (labels, buttons, end panel)
@@ -54,15 +54,17 @@ docs/                          — design + technical + player docs
 these scene changes, so meta progress carries over.
 
 The full loop is closed:
-- **Run start:** `main.gd` reads `SkillTree.build_run_modifiers()` and applies the buffs —
-  +phylactery max life, +starting Bone Dust, ×minion-damage (applied per minion at placement).
+- **Run start:** `main.gd` reads `SkillTree.build_run_modifiers()` and applies buffs —
+  +phylactery max life, +starting Bone Dust, ×minion-damage (applied per minion at placement) —
+  and **gates placement**: `_populate_available_minions()` offers only the tree's
+  `unlocked_minions` (resolving each id through the `MINION_REGISTRY` id→script map), so a fresh
+  save can place only the Bone Archer.
 - **During the run:** each kill adds to `WaveManager`'s Grave Bones harvest (`harvest_changed`
   → HUD readout), alongside the in-run Bone Dust reward.
 - **Run end (win or lose):** `_finish_run()` banks the harvest via `MetaState.bank_harvest()`
   (×1.5 on a clear), autosaves, and shows the banked total on the end screen.
 
-Not yet wired (later M1): minion-unlock *gating* (the run doesn't yet restrict placement to
-`RunModifiers.unlocked_minions`) and the third minion/enemy.
+Not yet wired (later M1): branching upgrades and a difficulty/balance pass.
 
 ## Core patterns
 - **Container UI vs. absolute UI:** the **Hub** uses Godot container nodes (`MarginContainer` /

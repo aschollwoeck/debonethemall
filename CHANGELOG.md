@@ -5,6 +5,12 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Added
+- **M1 · Bound Wraith, Wraith enemy & unlock gating** — a third minion (**Bound Wraith**,
+  Necrotic) and enemy (**Wraith**, Ethereal) whose armor resists all physical, so it *demands*
+  Necrotic (matrix tweaked: Pierce vs Ethereal → 0.5, so all physical is ×0.5). Minion-unlock **gating** is now
+  enforced — a run offers only the minions the tree has unlocked (start: Bone Archer only),
+  via a `MINION_REGISTRY` and a dynamic HUD. Wraiths appear in later waves. Tests for the
+  Ethereal counter rule and new minion/enemy stats.
 - **M1 · Run loop closed** — runs now harvest Grave Bones from kills (HUD readout), banked to
   `MetaState` on run-end (kept on loss, ×1.5 on a clear) with autosave, and the skill tree's
   `RunModifiers` (phylactery life, starting Bone Dust, minion damage) apply at run start. The

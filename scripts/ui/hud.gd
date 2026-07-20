@@ -8,8 +8,6 @@ signal minion_selected(kind: String)
 signal start_wave_pressed
 signal return_to_hub_pressed
 
-const ARCHER := "archer"
-const GOLEM := "golem"
 const PANEL_BG := Color(0.10, 0.08, 0.12, 0.92)
 
 var _dust_label: Label
@@ -17,13 +15,11 @@ var _life_label: Label
 var _wave_label: Label
 var _harvest_label: Label
 var _hint_label: Label
-var _archer_btn: Button
-var _golem_btn: Button
+var _minion_btns: Array[Button] = []
+var _minion_ids: Array[String] = []
 var _start_btn: Button
 var _end_panel: PanelContainer
 var _end_label: Label
-
-var _selected: String = ""
 
 
 func _ready() -> void:
@@ -39,14 +35,7 @@ func _build() -> void:
 	_harvest_label = _make_label(Vector2(316, 22), "Harvest: +0")
 	_harvest_label.add_theme_color_override("font_color", Color(0.55, 0.9, 0.6))
 
-	# ---- minion select (bottom-left) ----
-	_archer_btn = _make_button(Vector2(8, 236), Vector2(108, 22), "Archer (50)")
-	_archer_btn.toggle_mode = true
-	_archer_btn.pressed.connect(func(): _select(ARCHER))
-
-	_golem_btn = _make_button(Vector2(122, 236), Vector2(108, 22), "Golem (80)")
-	_golem_btn.toggle_mode = true
-	_golem_btn.pressed.connect(func(): _select(GOLEM))
+	# ---- minion select (bottom-left) — populated by set_minions() per unlocks ----
 
 	# ---- start wave (bottom-right) ----
 	_start_btn = _make_button(Vector2(388, 232), Vector2(84, 26), "Start Wave")
@@ -116,15 +105,29 @@ func _build_end_panel() -> void:
 
 
 func _select(kind: String) -> void:
-	_selected = kind
-	_archer_btn.button_pressed = kind == ARCHER
-	_golem_btn.button_pressed = kind == GOLEM
-	_archer_btn.toggle_mode = true
-	_golem_btn.toggle_mode = true
+	for i in _minion_btns.size():
+		_minion_btns[i].button_pressed = _minion_ids[i] == kind
 	minion_selected.emit(kind)
 
 
 # ---- public update API (called by Main) ----
+
+## Builds the minion-select buttons from the run's available minions.
+## Each entry: {"id": String, "name": String, "cost": int}.
+func set_minions(minions: Array) -> void:
+	for b in _minion_btns:
+		b.queue_free()
+	_minion_btns.clear()
+	_minion_ids.clear()
+	var x := 8
+	for m in minions:
+		var id: String = m["id"]
+		var btn := _make_button(Vector2(x, 236), Vector2(92, 22), "%s (%d)" % [m["name"], m["cost"]])
+		btn.toggle_mode = true
+		btn.pressed.connect(_select.bind(id))
+		_minion_btns.append(btn)
+		_minion_ids.append(id)
+		x += 96
 
 func set_dust(amount: int) -> void:
 	_dust_label.text = "Bone Dust: %d" % amount
@@ -144,9 +147,8 @@ func set_wave(current: int, total: int, active: bool) -> void:
 
 
 func clear_selection() -> void:
-	_selected = ""
-	_archer_btn.button_pressed = false
-	_golem_btn.button_pressed = false
+	for b in _minion_btns:
+		b.button_pressed = false
 
 
 func show_end(won: bool, banked_bones: int) -> void:
