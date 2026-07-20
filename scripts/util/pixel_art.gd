@@ -58,6 +58,21 @@ static func line(img: Image, x0: int, y0: int, x1: int, y1: int, col: Color) -> 
 			y0 += sy
 
 
+## A white silhouette of `src` — every non-transparent texel becomes white, alpha preserved.
+## Blitted over a sprite at a fading alpha, it makes the hit-flash (a bright pop) without needing
+## a second hand-authored image or an additive material.
+static func white_mask(src: Image) -> Image:
+	var w := src.get_width()
+	var h := src.get_height()
+	var out := canvas(w, h)
+	for y in h:
+		for x in w:
+			var a := src.get_pixel(x, y).a
+			if a > 0.0:
+				out.set_pixel(x, y, Color(1, 1, 1, a))
+	return out
+
+
 ## A NEAREST-filtered Sprite2D from pixel art, upscaled by `scale`. Origin sits at the art's
 ## bottom-centre (feet), matching how units are positioned by their base.
 ## Pass a **whole-number** `scale` (uneven scales shimmer under NEAREST), and prefer **even

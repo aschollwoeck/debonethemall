@@ -4,8 +4,9 @@ class_name Enemy
 ## matrix), advances through debone stages at HP thresholds (GDD §6), and either dies
 ## (granting Bone Dust) or reaches the phylactery (dealing damage to it).
 ##
-## Visuals are drawn in code via _draw() so we need no art for M0 — subclasses override
-## _draw() to render their per-stage shapes.
+## Visuals (art-direction restyle): the enemy is fine pixel art — the only pixelated layer on the
+## smooth world. Subclasses author each debone stage via `_author_stage()`; the base blits it
+## NEAREST-filtered over a soft (smooth) cast shadow, with a white-flash overlay when hit.
 
 signal died(reward: int, bones: int)
 signal reached_end(damage: int)
@@ -23,12 +24,23 @@ signal reached_end(damage: int)
 ## Optional per-stage speed multiplier (mechanical debone). Defaults to no change.
 @export var stage_speed_mult: Array[float] = [1.0, 1.0, 1.0]
 
+## Pixel-art body (see class docstring). Each debone stage's texture is authored once and cached;
+## `BODY_SCALE` is logical px per source texel (matches the minions' fine grid).
+const BODY_SCALE := 0.5
+
 var hp: float
 var stage: int = 0
 var _path: PackedVector2Array
 var _target_index: int = 1
 var _hit_flash: float = 0.0
 var _dead: bool = false
+var _stage_cache: Dictionary = {}   # stage:int → {tex, mask} (or null once authored as empty)
+
+
+func _enter_tree() -> void:
+	# Units are the pixel layer on the smooth world: sample the body texture NEAREST. Only the
+	# textured blit is affected — the soft cast shadow is a geometry primitive and stays smooth.
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 
 func _ready() -> void:
@@ -117,13 +129,58 @@ func _on_stage_changed() -> void:
 	pass
 
 
-## Soft cast shadow under the enemy (shared grounding; subclasses call it from _draw).
+## Soft cast shadow under the enemy (shared grounding). Stays smooth (geometry primitive).
 func _shadow(alpha: float = 0.35) -> void:
 	var pts := PackedVector2Array()
 	for i in 12:
 		var a := i * TAU / 12.0
 		pts.append(Vector2(cos(a) * 6.0, 8.0 + sin(a) * 2.4))
 	draw_colored_polygon(pts, Color(0, 0, 0, alpha))
+
+
+func _draw() -> void:
+	_shadow(_shadow_alpha())
+	_blit_stage()
+
+
+## Blits the current debone stage's pixel art (authored once, cached), NEAREST + upscaled, with a
+## white-flash overlay while `_hit_flash` decays.
+func _blit_stage() -> void:
+	if not _stage_cache.has(stage):
+		var img := _author_stage(stage)
+		if img == null:
+			_stage_cache[stage] = null
+		else:
+			_stage_cache[stage] = {
+				"tex": ImageTexture.create_from_image(img),
+				"mask": ImageTexture.create_from_image(PixelArt.white_mask(img)),
+			}
+	var entry: Variant = _stage_cache[stage]
+	if entry == null:
+		return
+	var tex: Texture2D = entry["tex"]
+	var w := tex.get_width() * BODY_SCALE
+	var h := tex.get_height() * BODY_SCALE
+	var rect := Rect2(-w / 2.0, _feet_y() - h, w, h)
+	draw_texture_rect(tex, rect, false)
+	if _hit_flash > 0.0:
+		draw_texture_rect(entry["mask"], rect, false, Color(1, 1, 1, _hit_flash * 0.7))
+
+
+## Shadow opacity — floating enemies (wraiths) barely touch the ground. Override in subclasses.
+func _shadow_alpha() -> float:
+	return 0.35
+
+
+## The local-space y where the sprite's bottom sits. Override for floaters (hover above ground).
+func _feet_y() -> float:
+	return 8.0
+
+
+## Override: author the enemy's fine pixel art for debone `stage` (feet at bottom-centre). Each
+## stage is authored once and cached. Returning null draws nothing for that stage.
+func _author_stage(_stage: int) -> Image:
+	return null
 
 
 func _die() -> void:

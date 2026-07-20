@@ -14,61 +14,61 @@ func _ready() -> void:
 	super._ready()
 
 
-func _draw() -> void:
-	_shadow()
-	var f := _hit_flash * 0.7
-	var ol := Color("241f19").lerp(Color.WHITE, f * 0.5)
-	var lo := Color("8f856a").lerp(Color.WHITE, f)
-	var mid := Color("c8bd9c").lerp(Color.WHITE, f)
-	var hi := Color("efe6cd").lerp(Color.WHITE, f)
-	match stage:
+## Fine pixel art per debone stage (art-direction §6/§7): whole → skull-off crawler → bone pile.
+func _author_stage(st: int) -> Image:
+	var out := Color("241f19")
+	var lo := Color("8f856a")
+	var mid := Color("c8bd9c")
+	var hi := Color("efe6cd")
+	match st:
 		0:
-			_draw_whole(ol, lo, mid, hi)
+			# whole marching skeleton, grinning
+			var img := PixelArt.canvas(28, 36)
+			PixelArt.rect(img, 11, 26, 2, 9, mid); PixelArt.vline(img, 11, 26, 9, lo)   # legs
+			PixelArt.rect(img, 15, 26, 2, 9, mid); PixelArt.vline(img, 16, 26, 9, lo)
+			PixelArt.rect(img, 10, 33, 3, 2, mid); PixelArt.rect(img, 15, 33, 3, 2, mid) # feet
+			PixelArt.rect(img, 11, 24, 6, 2, mid)                                        # pelvis
+			PixelArt.vline(img, 13, 14, 10, lo); PixelArt.vline(img, 14, 14, 10, mid)    # spine
+			for ry in [16, 18, 20, 22]:                                                  # ribs
+				PixelArt.hline(img, 11, ry, 6, mid)
+				PixelArt.px(img, 10, ry, lo); PixelArt.px(img, 17, ry, lo)
+			PixelArt.hline(img, 10, 14, 8, hi)                                           # shoulders
+			PixelArt.line(img, 11, 15, 8, 20, mid); PixelArt.line(img, 16, 15, 19, 20, mid) # arms
+			PixelArt.px(img, 8, 20, lo); PixelArt.px(img, 19, 20, lo)
+			PixelArt.rect(img, 10, 6, 8, 6, mid)                                         # skull
+			PixelArt.hline(img, 10, 6, 8, hi); PixelArt.vline(img, 10, 6, 6, lo)
+			PixelArt.rect(img, 11, 12, 6, 2, mid)                                        # jaw
+			PixelArt.rect(img, 11, 8, 2, 2, out); PixelArt.rect(img, 15, 8, 2, 2, out)   # eyes
+			PixelArt.px(img, 13, 11, out); PixelArt.px(img, 14, 11, out)                 # nasal
+			PixelArt.hline(img, 12, 13, 4, out)                                          # grin
+			return img
 		1:
-			_draw_crawler(ol, lo, mid)
+			# headless torso dragging itself forward; skull popped off, rolled behind (left)
+			var img := PixelArt.canvas(40, 20)
+			PixelArt.hline(img, 18, 10, 13, mid)                                         # ribcage top
+			PixelArt.hline(img, 18, 12, 14, mid)                                         # spine
+			PixelArt.hline(img, 18, 15, 13, lo)                                          # lower edge
+			for rx in [20, 23, 26, 29]:                                                  # ribs
+				PixelArt.vline(img, rx, 10, 5, lo)
+			PixelArt.px(img, 31, 11, mid); PixelArt.px(img, 32, 12, lo)                  # neck stub
+			PixelArt.line(img, 31, 13, 36, 16, mid)                                      # clawing arm
+			PixelArt.px(img, 37, 16, lo); PixelArt.px(img, 37, 15, lo)                   # claw
+			PixelArt.line(img, 18, 15, 14, 18, lo)                                       # dragging leg
+			PixelArt.rect(img, 6, 10, 7, 6, mid)                                         # popped skull
+			PixelArt.hline(img, 6, 10, 7, hi)
+			PixelArt.rect(img, 7, 16, 5, 1, lo)                                          # jaw
+			PixelArt.rect(img, 7, 12, 2, 2, out); PixelArt.rect(img, 10, 12, 2, 2, out)  # eyes
+			PixelArt.hline(img, 8, 15, 3, out)                                           # grin
+			return img
 		_:
-			_draw_pile(ol, lo, mid)
-
-
-func _draw_whole(ol: Color, lo: Color, mid: Color, hi: Color) -> void:
-	# marching legs
-	draw_line(Vector2(-1, 3), Vector2(-3, 9), mid, 1.5)
-	draw_line(Vector2(1, 3), Vector2(3, 8), mid, 1.5)
-	draw_rect(Rect2(-2, 2, 4, 2), lo)                 # pelvis
-	draw_line(Vector2(0, -4), Vector2(0, 3), mid, 1.5)  # spine
-	for ry in [-3.0, -1.0, 1.0]:                      # ribs
-		draw_line(Vector2(-3, ry), Vector2(3, ry + 0.4), lo, 1.0)
-	draw_line(Vector2(-1, -3), Vector2(-4, 1), mid, 1.0)  # arms
-	draw_line(Vector2(1, -3), Vector2(4, 0), mid, 1.0)
-	# skull
-	draw_circle(Vector2(0, -8), 3.4, mid)
-	draw_circle(Vector2(-1, -9), 1.1, hi)             # highlight
-	draw_rect(Rect2(-2, -9, 1.4, 1.4), ol)            # eye sockets
-	draw_rect(Rect2(0.6, -9, 1.4, 1.4), ol)
-	draw_rect(Rect2(-1.2, -6, 2.4, 1), ol)            # grinning teeth
-
-
-func _draw_crawler(ol: Color, lo: Color, mid: Color) -> void:
-	# headless torso dragging itself forward, one clawing arm
-	draw_line(Vector2(-5, 3), Vector2(4, 3), mid, 1.5)   # dragging ribcage
-	for x in [-3.0, -1.0, 1.0, 3.0]:
-		draw_line(Vector2(x, 1), Vector2(x, 4), lo, 1.0)
-	draw_line(Vector2(4, 3), Vector2(6, 2), mid, 1.0)    # neck stub (no skull)
-	draw_line(Vector2(5, 3), Vector2(8, 5), mid, 1.0)    # clawing arm
-	draw_line(Vector2(8, 5), Vector2(9.5, 4), lo, 1.0)   # claw
-	draw_line(Vector2(-5, 3), Vector2(-7, 6), lo, 1.0)   # dragging leg
-	# the gag: the skull popped off and rolled behind, still grinning
-	draw_circle(Vector2(-8, 4), 2.4, mid)
-	draw_rect(Rect2(-9, 3.4, 1, 1), ol)
-	draw_rect(Rect2(-7.4, 3.4, 1, 1), ol)
-	draw_rect(Rect2(-8.4, 5, 1.6, 0.7), ol)              # grin
-
-
-func _draw_pile(ol: Color, lo: Color, mid: Color) -> void:
-	# collapsed heap, skull half-buried grinning up
-	draw_line(Vector2(-5, 5), Vector2(3, 6), lo, 1.0)
-	draw_line(Vector2(-3, 7), Vector2(4, 5), lo, 1.0)
-	draw_line(Vector2(-1, 4), Vector2(2, 7), lo, 1.0)
-	draw_circle(Vector2(1, 6), 2.2, mid)
-	draw_rect(Rect2(0.2, 5.4, 0.9, 0.9), ol)
-	draw_rect(Rect2(1.6, 5.4, 0.9, 0.9), ol)
+			# collapsed heap; skull half-buried, still grinning up
+			var img := PixelArt.canvas(28, 16)
+			PixelArt.line(img, 6, 11, 18, 12, lo)
+			PixelArt.line(img, 8, 13, 20, 10, lo)
+			PixelArt.line(img, 10, 9, 14, 13, lo)
+			PixelArt.line(img, 15, 13, 22, 11, lo)
+			PixelArt.rect(img, 13, 8, 6, 5, mid)                                         # skull
+			PixelArt.hline(img, 13, 8, 6, hi)
+			PixelArt.rect(img, 14, 10, 1, 2, out); PixelArt.rect(img, 17, 10, 1, 2, out) # eyes
+			PixelArt.hline(img, 14, 12, 4, out)                                          # grin
+			return img

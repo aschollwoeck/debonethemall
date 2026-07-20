@@ -18,37 +18,61 @@ func _ready() -> void:
 	super._ready()
 
 
-func _draw() -> void:
-	_shadow(0.16)   # barely touches the ground — it floats
-	# fades as it debones; hit-flash brightens
-	var alpha: float = [0.62, 0.42, 0.28][stage] if stage < 3 else 0.28
-	var body := GHOST.lerp(Color.WHITE, _hit_flash * 0.6)
-	body.a = alpha
-	var crown := Color(body.r, body.g, body.b, min(1.0, alpha + 0.22))
-	var eye := Color(0.85, 1.0, 0.9, min(1.0, alpha + 0.4))
-	match stage:
+func _shadow_alpha() -> float:
+	return 0.16   # barely touches the ground — it floats
+
+
+func _feet_y() -> float:
+	return 4.0    # hovers above the ground
+
+
+## Fine pixel art per debone stage (art-direction §6/§7): whole → tattered → wisp, fading as it
+## debones. Ethereal: no hard outline, translucent green baked into the texels.
+func _author_stage(st: int) -> Image:
+	match st:
 		0:
-			_draw_ghost(body, crown, eye, 1.0, 5)
+			return _author_shroud(28, 36, 0.66, 9)
 		1:
-			_draw_ghost(body, crown, eye, 0.8, 6)   # smaller, more ragged
+			return _author_shroud(24, 32, 0.44, 10)   # smaller, more ragged, fainter
 		_:
-			# wisp: a fading smear, one dim eye
-			draw_circle(Vector2(0, -2), 2.4, body)
-			draw_line(Vector2(-3, 1), Vector2(2, 3), body, 1.0)
-			draw_circle(Vector2(0, -3), 0.8, eye)
+			# wisp: a fading smear with one dim eye
+			var g := Color(0.55, 0.86, 0.64, 0.30)
+			var eye := Color(0.9, 1.0, 0.92, 0.6)
+			var img := PixelArt.canvas(16, 16)
+			PixelArt.rect(img, 5, 4, 6, 5, g)
+			PixelArt.px(img, 6, 3, g); PixelArt.px(img, 9, 3, g)
+			PixelArt.line(img, 4, 9, 11, 11, g)
+			PixelArt.rect(img, 7, 6, 2, 2, eye)
+			return img
 
 
-## Hooded shroud tapering to a tattered lower edge. `sc` scales it, `tails` sets the raggedness.
-func _draw_ghost(body: Color, crown: Color, eye: Color, sc: float, tails: int) -> void:
-	var pts := PackedVector2Array([
-		Vector2(-6 * sc, 2), Vector2(-6 * sc, -6 * sc), Vector2(0, -13 * sc),
-		Vector2(6 * sc, -6 * sc), Vector2(6 * sc, 2)])
-	for i in range(tails + 1):                       # tattered hem
-		var x := lerpf(6.0 * sc, -6.0 * sc, float(i) / tails)
-		var y := 2.0 + (3.5 if i % 2 == 0 else 0.5)
-		pts.append(Vector2(x, y))
-	draw_colored_polygon(pts, body)
-	draw_colored_polygon(PackedVector2Array([                       # lit crown
-		Vector2(-3 * sc, -8 * sc), Vector2(0, -13 * sc), Vector2(3 * sc, -8 * sc), Vector2(0, -6 * sc)]), crown)
-	draw_circle(Vector2(-2 * sc, -7 * sc), 1.0, eye)                # glowing eyes
-	draw_circle(Vector2(2 * sc, -7 * sc), 1.0, eye)
+## A hooded shroud tapering to a tattered hem, glowing eyes, lit crown. `a` is the base opacity;
+## `tails` sets the raggedness of the hem. Fills a `w`×`h` canvas (feet at bottom-centre).
+func _author_shroud(w: int, h: int, a: float, tails: int) -> Image:
+	var g := Color(0.55, 0.86, 0.64, a)
+	var gh := Color(0.74, 0.97, 0.80, min(1.0, a + 0.24))   # lit crown
+	var hollow := Color(0.03, 0.10, 0.06, min(1.0, a + 0.20))
+	var eye := Color(0.9, 1.0, 0.92, min(1.0, a + 0.34))
+	var img := PixelArt.canvas(w, h)
+	var cx := w / 2
+	var body_top := 10
+	var hem := h - 10
+	# hood crown, narrowing to a point
+	for y in range(2, body_top + 4):
+		var half := mini((y - 2) + 1, cx - 3)
+		PixelArt.hline(img, cx - half, y, half * 2, g)
+	# body
+	PixelArt.rect(img, 3, body_top, w - 6, hem - body_top, g)
+	# tattered hem
+	for i in range((w - 6) / 2):
+		var hx := 3 + i * 2
+		var hh := 6 if i % 2 == 0 else 3
+		PixelArt.vline(img, hx, hem, hh, g)
+	# lit crown edge
+	for y in range(2, body_top):
+		var half := (y - 2) + 1
+		PixelArt.px(img, cx - half, y, gh); PixelArt.px(img, cx - 1 + half, y, gh)
+	# face hollow + glowing eyes
+	PixelArt.rect(img, cx - 5, 6, 10, 8, hollow)
+	PixelArt.rect(img, cx - 3, 8, 2, 2, eye); PixelArt.rect(img, cx + 1, 8, 2, 2, eye)
+	return img

@@ -58,6 +58,17 @@ func test_line_off_canvas_is_clipped_not_crashing() -> void:
 	assert_eq(img.get_pixel(1, 1), Color.RED, "the in-bounds part is written")
 
 
+func test_white_mask_whitens_opaque_preserves_alpha_and_clear() -> void:
+	var img := PixelArt.canvas(4, 4)
+	PixelArt.px(img, 1, 1, Color(0.2, 0.5, 0.9, 1.0))     # opaque colour
+	PixelArt.px(img, 2, 2, Color(0.2, 0.5, 0.9, 0.4))     # semi-transparent colour
+	var m := PixelArt.white_mask(img)
+	assert_eq(m.get_pixel(1, 1), Color(1, 1, 1, 1.0), "opaque texel → white, alpha kept")
+	assert_almost_eq(m.get_pixel(2, 2).r, 1.0, 0.001, "semi texel → white")
+	assert_almost_eq(m.get_pixel(2, 2).a, 0.4, 0.001, "semi texel keeps its alpha")
+	assert_almost_eq(m.get_pixel(0, 0).a, 0.0, 0.001, "transparent texel stays clear")
+
+
 func test_sprite_is_nearest_upscaled_feet_at_origin() -> void:
 	var img := PixelArt.canvas(16, 24)
 	var spr := PixelArt.sprite(img, 3.0)
