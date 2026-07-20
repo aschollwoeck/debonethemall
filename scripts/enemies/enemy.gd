@@ -117,6 +117,15 @@ func _on_stage_changed() -> void:
 	pass
 
 
+## Soft cast shadow under the enemy (shared grounding; subclasses call it from _draw).
+func _shadow(alpha: float = 0.35) -> void:
+	var pts := PackedVector2Array()
+	for i in 12:
+		var a := i * TAU / 12.0
+		pts.append(Vector2(cos(a) * 6.0, 8.0 + sin(a) * 2.4))
+	draw_colored_polygon(pts, Color(0, 0, 0, alpha))
+
+
 func _die() -> void:
 	if _dead:
 		return

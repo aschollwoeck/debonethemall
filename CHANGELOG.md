@@ -29,6 +29,11 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   (skeletal archer drawing a bone bow, quiver on back), **Bone-Mill Golem** (hunched stone grinder
   with a bone-toothed maw and glowing necrotic cracks/eyes), **Bound Wraith** (chained hooded
   spectre with a dark face-hollow and soul orb). Upgrade-tier pips retained.
+- **M2 · Visual overhaul, slice 5 (enemies)** — re-arted the three enemies and their **debone
+  stages** into shaded sprites with cast shadows: **Skeleton Grunt** (marching skeleton →
+  headless crawler with its popped-off skull grinning behind it → bone pile), **Skeletal Dog**
+  (running hound → two sliding halves), **Wraith** (hooded ghost → tattered → fading wisp). The
+  macabre debone slapstick (GDD §6, art-direction §7) now reads.
 
 ### Added
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
