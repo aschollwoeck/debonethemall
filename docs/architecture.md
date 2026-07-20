@@ -7,13 +7,18 @@ systems are added or reshaped.
 
 ## Stack
 - **Engine:** Godot 4.7 (standard/GDScript build), GL Compatibility renderer.
-- **Rendering:** pixel-perfect 2D — base viewport 480×270, `viewport` stretch + `keep` aspect,
-  Nearest texture filter. Visuals are currently **code-drawn** (`_draw()`), no art assets yet
-  (see [ADR 0001](./adr/0001-code-driven-visuals.md)).
+- **Rendering (mixed resolution — [ADR 0004](./adr/0004-mixed-resolution-rendering.md)):** the
+  world and UI render **smooth at native resolution** — `canvas_items` stretch, `keep` aspect,
+  **Linear** filter — over a 480×270 logical coordinate base (all gameplay coords stay in that
+  space). **Units** are the only pixelated layer: pixel art authored into `Image`s and shown
+  **NEAREST-filtered, upscaled** via `PixelArt` (`scripts/util/pixel_art.gd`). Visuals are
+  **code-drawn** (`_draw()` for the smooth world/UI; `PixelArt` images for units), no external art
+  assets ([ADR 0001](./adr/0001-code-driven-visuals.md)).
 
 ## Project layout
 ```
 scripts/
+  util/     pixel_art.gd      — pixel-unit pipeline: author art into an Image → NEAREST sprite
   combat/   combat_types.gd   — CombatTypes autoload: damage/armor enums + counter matrix
   core/     game_state.gd      — GameState autoload: in-run Bone Dust economy
             meta_state.gd      — MetaState autoload: persistent cross-run save (Grave Bones + unlocks)

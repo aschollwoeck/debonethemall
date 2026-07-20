@@ -5,6 +5,13 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 1 (rendering foundation)** — switched the game from a fixed 480×270
+  `viewport` stretch (uniform big pixels) to `canvas_items` stretch + **Linear** filter, so the
+  world and UI now render **smooth at native resolution** while keeping the 480×270 logical
+  coordinate space (no gameplay changes). Added the **`PixelArt`** pipeline
+  (`scripts/util/pixel_art.gd`) — author pixel art into an `Image` → NEAREST-filtered upscaled
+  `Sprite2D` — so units stay crisp pixels on the smooth world (art-direction §0, [ADR 0004]). Units
+  and backdrop still use the old draw and look intermediate until later M2b slices re-art them.
 - **M2 · Visual overhaul, slice 1 (backdrop & tileset)** — replaced the flat grey field + brown
   polyline with a layered `Backdrop`: a horizon strip (cold sky, sick moon, crypt-spire
   silhouettes) over a top-down dark graveyard field with drifting ground fog, and a cobbled
