@@ -20,6 +20,10 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   necrotic motes from a procedural glow texture, and a `Vignette` crushes the edges into
   oppressive dark. The lighting's `accent` is the **per-act signature glow** — green now, one
   value swaps a later act to witchfire purple. Turns the dark field into a lit, oppressive place.
+- **M2 · Visual overhaul, slice 3 (phylactery)** — re-arted the phylactery from a flat diamond
+  into a faceted crystal on a rune-etched stone dais (shaded facets, inner spark,
+  gentle bob). It's life-driven: shifts necrotic green → blood-red and fractures (cracks
+  revealed progressively) as its life falls.
 
 ### Added
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
