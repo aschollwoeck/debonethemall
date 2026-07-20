@@ -141,7 +141,10 @@ func _build() -> void:
 	_life_text.size = Vector2(150, 15)
 	_life_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_life_text.add_theme_font_size_override("font_size", 9)
-	_life_text.add_theme_color_override("font_color", Color("0a0812"))
+	# bone text with a dark outline so it reads over both the green fill and the dark remainder
+	_life_text.add_theme_color_override("font_color", BONE)
+	_life_text.add_theme_color_override("font_outline_color", Color(0.02, 0.02, 0.04, 0.9))
+	_life_text.add_theme_constant_override("outline_size", 2)
 	add_child(_life_text)
 
 	_harvest_val = _plaque(Vector2(316, 28), "HARVEST +", NECRO)
