@@ -48,7 +48,7 @@ func _ready() -> void:
 	_mods = SkillTree.build_run_modifiers()
 	_damage_mult = _mods.minion_damage_mult
 
-	# Atmospheric backdrop + cobbled path (draws behind gameplay). M2 slice 1.
+	# Atmospheric backdrop + stone road (draws behind gameplay).
 	var backdrop := Backdrop.new()
 	add_child(backdrop)
 	backdrop.setup(_path)
@@ -264,8 +264,8 @@ func _update_wave_hud() -> void:
 # ---------------------------------------------------------------- drawing (path + slots)
 
 func _draw() -> void:
-	# The cobbled path is now drawn by the Backdrop (behind gameplay). Here we draw only the
-	# build-slot markers (the gameplay overlay), which sit above the path but below minions.
+	# The stone road is now drawn by the Backdrop (behind gameplay). Here we draw only the
+	# build-slot markers (the gameplay overlay), which sit above the road but below minions.
 	var can_afford_selected := _selected_affordable()
 	for i in _slots.size():
 		var p: Vector2 = _slots[i]

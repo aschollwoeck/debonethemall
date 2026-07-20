@@ -104,7 +104,7 @@ Back → front, with parallax and haze:
 2. **Far silhouettes** — crypt spires / broken cathedrals, near-black with a thin moonlit rim.
 3. **Fog band** — a drifting translucent haze that separates far from mid.
 4. **Mid set-dressing** — tilted gravestones, dead trees, broken iron fence, the macabre props.
-5. **The path** — cobbled cold stone, cracked flagstones, mortar, moss tufts, embedded glowing runes.
+5. **The road** — a smoothly-lit cold-stone band with rune glimmers (the glimmer from the lighting pass).
 6. **Foreground** — your minions on bone-ringed plots; a dark near-silhouette lip for depth.
 
 ## 9. Macabre set dressing (the "crazy")
