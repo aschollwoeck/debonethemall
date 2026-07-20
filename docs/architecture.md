@@ -28,7 +28,7 @@ scripts/
   minions/  minion.gd (base) + bone_archer.gd, bone_mill_golem.gd, bound_wraith.gd, projectile.gd
   meta/     skill_tree.gd      — SkillTree autoload: node data, purchase, run-modifier aggregation
             run_modifiers.gd   — RunModifiers value object (aggregated tree effects for a run)
-  world/    backdrop.gd        — layered graveyard backdrop + cobbled path (draws behind gameplay)
+  world/    backdrop.gd        — smooth painted graveyard backdrop + stone road (draws behind gameplay)
             lighting.gd        — additive glow pass (phylactery/braziers/runes/motes); per-act accent
             vignette.gd        — heavy edge vignette over the world, under the HUD
   ui/       hud.gd             — code-built HUD (labels, buttons, end panel, upgrade popup)
@@ -87,11 +87,12 @@ final tuning is a playtest task.
 ## Visuals (M2 overhaul — complete)
 Replaced the placeholder art with the crypt aesthetic (docs/art-direction.md). The
 **`Backdrop`** node (`world/backdrop.gd`, `z_index = -10`) draws the atmospheric world behind
-gameplay — a horizon strip (sky, sick moon, crypt spires) over a top-down dark graveyard field
-(varied ground + macabre set-dressing: gravestones, skull piles, a summoning circle, braziers,
-…) with drifting ground fog, plus the cobbled path with glowing rune-stones (given the enemy
-path via `setup()`). Props are placed clear of the path and build slots. `main._draw()` now draws
-only the build-slot markers.
+gameplay. Post-M2b it is **smooth/painted** (native-res renderer): a horizon strip (gradient sky,
+soft glowing moon, hazy crypt spires) over a misty graveyard field with soft painted set-dressing
+(gravestones, skull piles, a summoning circle, braziers, …) and a **smoothly-lit stone road**
+(given the enemy path via `setup()`). Props are placed clear of the path and build slots;
+`main._draw()` draws only the build-slot markers. The bright glimmer of braziers / summoning
+circle / runes comes from the `Lighting` pass.
 
 The **`Lighting`** node (`world/lighting.gd`, `z 5`, additive `CanvasItemMaterial`) draws soft
 glow pools over the world — phylactery, braziers, summoning circle, rune-stones — plus drifting

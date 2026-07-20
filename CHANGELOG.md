@@ -5,6 +5,11 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 2 (smooth backdrop)** — repainted the graveyard backdrop smooth/painterly
+  for the native-res renderer: gradient sky + a soft glowing moon, hazy crypt-spire silhouettes, a
+  smoothly-lit stone road (no more pixel cobbles), soft painted gravestones / skull-piles /
+  summoning-circle / braziers, and drifting mist. Replaces the pixel-designed `Backdrop`;
+  light-source anchors preserved for the lighting pass (fog/mist still drawn here).
 - **M2b · Restyle, slice 1 (rendering foundation)** — switched the game from a fixed 480×270
   `viewport` stretch (uniform big pixels) to `canvas_items` stretch + **Linear** filter, so the
   world and UI now render **smooth at native resolution** while keeping the 480×270 logical
