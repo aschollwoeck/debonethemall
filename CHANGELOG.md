@@ -5,6 +5,14 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 6 (enemies as fine pixel art)** — the three enemies and all their **debone
+  stages** are now fine pixel art (art-direction §0/§6/§7), the only pixelated layer on the smooth
+  world. The base `Enemy` blits the current stage's texture NEAREST-filtered over a soft (smooth)
+  cast shadow, with a **white-flash overlay** when hit (via a new `PixelArt.white_mask`, +tests).
+  **Skeleton Grunt** (marching skeleton → skull-off crawler with its skull grinning behind it →
+  bone pile), **Skeletal Dog** (running hound → split halves), **Wraith** (translucent hooded
+  shroud → tattered → fading wisp; floats, so it overrides shadow opacity + hover height). Debone
+  thresholds / speed / rewards unchanged.
 - **M2b · Restyle, slice 5 (minions as fine pixel art)** — the three minions are now authored as
   **fine pixel art** via the `PixelArt` pipeline (NEAREST-filtered, ~2× the old build's linear
   density) — the only pixelated layer on the smooth world (art-direction §0/§6). **Bone Archer**
