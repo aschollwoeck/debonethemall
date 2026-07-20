@@ -114,12 +114,32 @@ func _draw() -> void:
 	if _show_range:
 		draw_circle(Vector2.ZERO, attack_range, Color(1, 1, 1, 0.06))
 		draw_arc(Vector2.ZERO, attack_range, 0, TAU, 48, Color(1, 1, 1, 0.18), 1.0)
+	_draw_ground()
 	_draw_body()
-	# small pips marking upgrade tier
+	# pips marking upgrade tier, above the sprite
 	for i in tier:
-		draw_circle(Vector2(-4 + i * 4.0, -9), 1.2, Color(0.95, 0.85, 0.4))
+		draw_circle(Vector2(-4 + i * 4.0, -16), 1.2, Color(0.95, 0.85, 0.4))
 
 
-## Override in subclasses to render the minion.
+## Cast shadow + a bone-ringed plot under the minion (shared grounding for all minions).
+func _draw_ground() -> void:
+	_ellipse(Vector2(0, 8), 9.0, 3.4, Color(0, 0, 0, 0.4))     # shadow
+	_ellipse(Vector2(0, 7), 8.0, 3.0, Color("15121f"))         # plot base
+	_ellipse(Vector2(0, 6.5), 6.0, 2.2, Color("201f2b"))       # plot top
+	for i in 6:                                                # ring of little bones
+		var a := i * TAU / 6.0
+		var p := Vector2(cos(a) * 7.0, 7.0 + sin(a) * 3.0)
+		draw_rect(Rect2(p.x - 1.0, p.y - 0.5, 2.0, 1.0), Color("3a3524"))
+
+
+func _ellipse(c: Vector2, rx: float, ry: float, col: Color) -> void:
+	var pts := PackedVector2Array()
+	for i in 16:
+		var a := i * TAU / 16.0
+		pts.append(c + Vector2(cos(a) * rx, sin(a) * ry))
+	draw_colored_polygon(pts, col)
+
+
+## Override in subclasses to render the minion (above the plot; origin at its base).
 func _draw_body() -> void:
-	draw_circle(Vector2.ZERO, 6.0, Color.WHITE)
+	draw_circle(Vector2(0, -6), 6.0, Color.WHITE)

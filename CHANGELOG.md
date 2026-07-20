@@ -24,6 +24,11 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   into a faceted crystal on a rune-etched stone dais (shaded facets, inner spark,
   gentle bob). It's life-driven: shifts necrotic green → blood-red and fractures (cracks
   revealed progressively) as its life falls.
+- **M2 · Visual overhaul, slice 4 (minions)** — re-arted the three towers from stick-figures into
+  shaded sprites, each grounded on a shared bone-ringed plot with a cast shadow: **Bone Archer**
+  (skeletal archer drawing a bone bow, quiver on back), **Bone-Mill Golem** (hunched stone grinder
+  with a bone-toothed maw and glowing necrotic cracks/eyes), **Bound Wraith** (chained hooded
+  spectre with a dark face-hollow and soul orb). Upgrade-tier pips retained.
 
 ### Added
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two

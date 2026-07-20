@@ -2,9 +2,6 @@ extends Minion
 ## Bone Archer — Pierce, single-target, cheap and fast, long range.
 ## Great vs. soft (skeletal dogs); rattles uselessly through bone (skeleton grunts).
 
-const BONE := Color("e8e2d0")
-const DARK := Color("1a141f")
-
 
 func _ready() -> void:
 	display_name = "Bone Archer"
@@ -44,11 +41,30 @@ func _apply_branch(id: String, t: int) -> void:
 
 
 func _draw_body() -> void:
-	# little pedestal
-	draw_rect(Rect2(-5, 4, 10, 3), DARK)
-	# skeleton torso
-	draw_circle(Vector2(0, -6), 3.0, BONE)      # skull
-	draw_line(Vector2(0, -3), Vector2(0, 4), BONE, 1.5)
-	# bow (drawn as an arc on the right)
-	draw_arc(Vector2(4, -1), 5.0, -PI / 2.2, PI / 2.2, 10, BONE, 1.2)
-	draw_line(Vector2(4, -5), Vector2(4, 3), Color(0.8, 0.7, 0.5), 1.0)  # bowstring
+	var ol := Color("241f19")
+	var lo := Color("9c9276")
+	var mid := Color("d8cdae")
+	var hi := Color("f2ead2")
+	# quiver of arrows slung on the back
+	draw_line(Vector2(-4, -12), Vector2(-6, -2), Color("5a4a30"), 2.0)
+	draw_line(Vector2(-6, -13), Vector2(-4, -11), lo, 1.0)
+	draw_line(Vector2(-7, -12), Vector2(-5, -10), lo, 1.0)
+	# legs
+	draw_line(Vector2(-1, 2), Vector2(-3, 6), mid, 1.5)
+	draw_line(Vector2(1, 2), Vector2(2, 6), mid, 1.5)
+	# spine + ribcage
+	draw_line(Vector2(0, -9), Vector2(0, 3), mid, 2.0)
+	for ry in [-6.0, -4.0, -2.0]:
+		draw_line(Vector2(-3, ry), Vector2(3, ry + 0.5), lo, 1.0)
+	# skull
+	draw_circle(Vector2(0, -11), 3.2, mid)
+	draw_circle(Vector2(-1, -12), 1.2, hi)          # highlight
+	draw_rect(Rect2(-2, -12, 1.4, 1.4), ol)         # eye sockets
+	draw_rect(Rect2(0.6, -12, 1.4, 1.4), ol)
+	draw_rect(Rect2(-1, -9, 2, 1), ol)              # jaw
+	# bone bow on the right, arrow nocked
+	draw_arc(Vector2(6, -6), 7.0, -1.2, 1.2, 14, mid, 1.6)
+	draw_line(Vector2(6, -12), Vector2(6, 0), Color(0.7, 0.65, 0.5), 1.0)   # string
+	draw_line(Vector2(1, -6), Vector2(11, -6), hi, 1.0)                     # arrow shaft
+	draw_rect(Rect2(10.5, -6.7, 1.6, 1.6), ol)                             # arrowhead
+	draw_line(Vector2(0, -6), Vector2(4, -6), lo, 1.0)                      # drawing arm
