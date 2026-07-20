@@ -1,11 +1,14 @@
 extends Node2D
 class_name Backdrop
-## Layered graveyard backdrop (M2 slice 1 — the Visual Overhaul, docs/art-direction.md §8).
+## Layered graveyard backdrop (M2 visual overhaul, docs/art-direction.md §8–9).
 ## Replaces the flat grey field with atmosphere: a distant horizon strip (cold sky, a sick moon,
-## crypt-spire silhouettes) over a top-down dark graveyard field (dirt/moss/bone speckle +
-## drifting ground fog), plus the cobbled winding path. Draws behind gameplay (z_index -10).
+## crypt-spire silhouettes) over a top-down dark graveyard field with varied ground (blotches,
+## cracks, moss, gravel, bone), a scatter of macabre set-dressing (gravestones, dead trees,
+## skull piles, staked skulls, a summoning circle, braziers, blood, loose bones, a broken fence),
+## and the cobbled winding path. Draws behind gameplay (z_index -10), clear of path/build slots.
 ##
-## Lighting, vignette, and the additive glow are M2 slice 2; the macabre prop kit is slice 7.
+## The additive lighting/vignette that makes the braziers, summoning circle, and runes bloom is
+## M2 slice 2; here they're drawn as their base (unlit) shapes.
 
 const HORIZON := 50.0   # y below which the top-down field begins
 
@@ -18,22 +21,33 @@ const SPIRE := Color("0b0817")
 const MOON := Color("c3d3bb")
 const STAR := Color("3a4650")
 const MOSS := Color("1c3324")
+const GRAVEL := Color("2a2734")
 const BONEBIT := Color("2e2718")
 const DIRT := Color("120f1c")
+const BLOTCH := Color(0, 0, 0, 0.22)
+const CRACK := Color(0.02, 0.015, 0.03, 0.9)
 const STONE_DARK := Color("050308")
 const STONE_BASE := Color("211f2c")
 const STONE_LIT := Color("2b2836")
 const COBBLE := Color("34313e")
 const GRAVE := Color("100d1c")
+const GRAVE_LIT := Color("1c1830")
 const TREE := Color("080611")
+const SKULL := Color("cdc3a4")
+const SKULL_DARK := Color("141018")
+const EMBER := Color("e8a24a")
+const BLOOD := Color(0.34, 0.07, 0.10, 0.5)
 const RUNE := Color("63e39a")   # act accent — slice 2 makes it bloom
+
 const FOG_COLOR := Color(0.55, 0.62, 0.58, 0.028)
 ## Crypt spires along the horizon: [x, height].
 const SPIRES := [[28, 40], [44, 54], [58, 30], [150, 26], [300, 34], [408, 44], [430, 58], [452, 34]]
 
 var _path: PackedVector2Array
 var _stars: Array = []
-var _speckles: Array = []       # {p:Vector2, c:Color}
+var _speckles: Array = []       # {p:Vector2, c:Color, s:int}  (s = pixel size)
+var _blotches: Array = []       # {p:Vector2, r:float}
+var _cracks: Array = []         # {a:Vector2, b:Vector2}
 var _cobbles: Array = []        # {p:Vector2, c:Color}
 var _runes: Array = []          # Vector2
 var _fog: float = 0.0
@@ -56,13 +70,30 @@ func _generate() -> void:
 	_stars.clear()
 	for i in 40:
 		_stars.append(Vector2(rng.randf() * 480.0, rng.randf() * HORIZON))
+	# ground speckle: dirt / moss clumps / gravel / bone bits
 	_speckles.clear()
-	for i in 280:
+	for i in 320:
 		var p := Vector2(rng.randf() * 480.0, HORIZON + rng.randf() * (270.0 - HORIZON))
 		var v := rng.randf()
-		var c := MOSS if v > 0.9 else (BONEBIT if v > 0.85 else DIRT)
-		_speckles.append({"p": p, "c": c})
-	# cobble texture + glowing rune stones sampled along the real path
+		var c: Color; var s := 1
+		if v > 0.92: c = MOSS; s = 2
+		elif v > 0.86: c = GRAVEL; s = 1
+		elif v > 0.82: c = BONEBIT; s = 1
+		else: c = DIRT; s = 1
+		_speckles.append({"p": p, "c": c, "s": s})
+	# large soft dark patches (ground variegation)
+	_blotches.clear()
+	for i in 7:
+		_blotches.append({"p": Vector2(rng.randf() * 480.0, HORIZON + rng.randf() * (270.0 - HORIZON)),
+			"r": 24.0 + rng.randf() * 34.0})
+	# hairline cracks in the earth
+	_cracks.clear()
+	for i in 26:
+		var a := Vector2(rng.randf() * 480.0, HORIZON + rng.randf() * (270.0 - HORIZON))
+		var ang := rng.randf() * TAU
+		var ln := 4.0 + rng.randf() * 9.0
+		_cracks.append({"a": a, "b": a + Vector2(cos(ang), sin(ang)) * ln})
+	# cobble texture + rune stones along the real path
 	_cobbles.clear()
 	_runes.clear()
 	if _path.size() >= 2:
@@ -95,29 +126,28 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	# base
 	draw_rect(Rect2(0, 0, 480, 270), GROUND_LO)
 	# --- horizon strip ---
 	_vgrad(0, 0, 480, HORIZON, SKY_TOP, SKY_HORIZON, 16)
 	for s in _stars:
 		draw_rect(Rect2(s.x, s.y, 1, 1), STAR)
-	# sick moon + faint halo (kept clear of the top-right HUD readouts)
 	draw_circle(Vector2(240, 17), 13, Color(0.58, 0.72, 0.55, 0.10))
 	draw_circle(Vector2(240, 17), 8, MOON)
-	# crypt spires rising to the horizon
 	for sp in SPIRES:
 		_spire(sp[0], sp[1])
 	# --- top-down field ---
 	_vgrad(0, HORIZON, 480, 270 - HORIZON, GROUND_HI, GROUND_LO, 20)
+	for b in _blotches:
+		draw_circle(b.p, b.r, BLOTCH)
 	for sp in _speckles:
-		draw_rect(Rect2(sp.p.x, sp.p.y, 1, 1), sp.c)
-	# sparse set-dressing, kept clear of the path corridor (the macabre kit is slice 7)
-	_gravestone(30, 132); _gravestone(38, 250); _gravestone(432, 246)
-	_gravestone(96, 256); _gravestone(206, 258)
-	_tree(15, 150, 26); _tree(466, 150, 24)
-	# --- the cobbled path ---
+		draw_rect(Rect2(sp.p.x, sp.p.y, sp.s, sp.s), sp.c)
+	for cr in _cracks:
+		draw_line(cr.a, cr.b, CRACK, 1.0)
+	# --- set-dressing (kept clear of the path corridor and the 9 build slots) ---
+	_draw_props()
+	# --- the cobbled path (drawn over the ground, kept clean) ---
 	_draw_path()
-	# --- drifting ground fog (subtle) ---
+	# --- drifting ground fog ---
 	_draw_fog()
 
 
@@ -133,17 +163,99 @@ func _spire(x: float, h: float) -> void:
 		Vector2(x, HORIZON - h), Vector2(x + 4, HORIZON - h - 7), Vector2(x + 8, HORIZON - h)]), SPIRE)
 
 
-func _gravestone(x: float, y: float) -> void:
+# ---------------------------------------------------------------- set-dressing
+
+func _draw_props() -> void:
+	# a small graveyard clustered bottom-left, and lone stones tucked in the path's pockets
+	_grave(16, 240); _grave_cross(34, 256); _grave(52, 242)
+	_grave(170, 92); _grave(282, 136); _grave(386, 92)
+	# dead trees at the field edges
+	_tree(12, 132, 24); _tree(470, 132, 22)
+	# macabre kit (docs/art-direction.md §9)
+	_skull_pile(72, 256); _skull_pile(432, 236)
+	_staked_skull(30, 178); _staked_skull(452, 150)
+	_summon_circle(236, 246, 15)
+	_brazier(84, 88); _brazier(318, 190)
+	_blood(412, 186); _blood(150, 250)
+	_bones(44, 158); _bones(196, 250)
+	_fence(4, 96, 266)
+
+
+func _grave(x: float, y: float) -> void:
 	draw_rect(Rect2(x - 4, y - 10, 8, 10), GRAVE)
 	draw_circle(Vector2(x, y - 10), 4, GRAVE)
-	draw_rect(Rect2(x - 4, y - 8, 1, 8), STONE_DARK)
+	draw_rect(Rect2(x - 4, y - 10, 1, 10), GRAVE_LIT)   # lit left edge
+	draw_rect(Rect2(x - 2, y - 6, 4, 1), STONE_DARK)    # a carved line
+
+
+func _grave_cross(x: float, y: float) -> void:
+	draw_rect(Rect2(x - 1, y - 11, 2, 11), GRAVE)
+	draw_rect(Rect2(x - 4, y - 8, 8, 2), GRAVE)
+	draw_rect(Rect2(x - 1, y - 11, 1, 11), GRAVE_LIT)
 
 
 func _tree(x: float, base: float, h: float) -> void:
 	draw_line(Vector2(x, base), Vector2(x - 2, base - h), TREE, 2.0)
 	draw_line(Vector2(x - 2, base - h), Vector2(x - 8, base - h - 5), TREE, 1.0)
 	draw_line(Vector2(x - 2, base - h + 4), Vector2(x + 6, base - h - 2), TREE, 1.0)
+	draw_line(Vector2(x - 1, base - h * 0.5), Vector2(x - 6, base - h * 0.5 - 3), TREE, 1.0)
 
+
+func _skull(x: float, y: float, s: float) -> void:
+	draw_circle(Vector2(x, y), s, SKULL)
+	draw_rect(Rect2(x - s * 0.7, y, s * 1.4, s * 0.9), SKULL)
+	draw_rect(Rect2(x - s * 0.6, y - s * 0.2, s * 0.5, s * 0.5), SKULL_DARK)
+	draw_rect(Rect2(x + s * 0.1, y - s * 0.2, s * 0.5, s * 0.5), SKULL_DARK)
+
+
+func _skull_pile(x: float, y: float) -> void:
+	_skull(x, y, 4.0); _skull(x + 7, y, 4.0); _skull(x - 4, y + 1, 3.2); _skull(x + 3, y - 6, 3.4)
+
+
+func _staked_skull(x: float, y: float) -> void:
+	draw_rect(Rect2(x, y - 8, 1, 8), Color("0c0a16"))   # foreshortened stake
+	_skull(x, y - 10, 3.0)
+
+
+func _summon_circle(x: float, y: float, r: float) -> void:
+	draw_circle(Vector2(x, y), r, Color(RUNE.r, RUNE.g, RUNE.b, 0.05))   # faint inner
+	draw_arc(Vector2(x, y), r, 0, TAU, 40, RUNE, 1.0)
+	draw_arc(Vector2(x, y), r - 3, 0, TAU, 36, Color(RUNE.r, RUNE.g, RUNE.b, 0.5), 1.0)
+	for i in 6:                                          # rune ticks around the ring
+		var a := i * TAU / 6.0
+		var p := Vector2(x + cos(a) * r, y + sin(a) * r)
+		draw_rect(Rect2(p.x - 1, p.y - 1, 2, 2), RUNE)
+
+
+func _brazier(x: float, y: float) -> void:
+	draw_rect(Rect2(x - 1, y, 2, 6), Color("1a1622"))   # post
+	draw_rect(Rect2(x - 3, y - 3, 6, 3), Color("2a2734")) # bowl
+	draw_rect(Rect2(x - 1, y - 5, 2, 3), EMBER)          # ember (blooms in slice 2)
+
+
+func _blood(x: float, y: float) -> void:
+	draw_circle(Vector2(x, y), 4.0, BLOOD)
+	draw_circle(Vector2(x + 4, y + 1), 2.0, BLOOD)
+
+
+func _bones(x: float, y: float) -> void:
+	draw_line(Vector2(x - 3, y), Vector2(x + 3, y - 1), SKULL, 1.0)
+	draw_line(Vector2(x - 2, y + 2), Vector2(x + 3, y + 1), SKULL, 1.0)
+	draw_circle(Vector2(x + 3, y), 1.4, SKULL)
+
+
+func _fence(x0: float, x1: float, y: float) -> void:
+	var x := x0
+	var i := 0
+	while x < x1:
+		var tall := 2.0 if i % 5 == 4 else 6.0   # every 5th bar snapped short
+		draw_line(Vector2(x, y), Vector2(x, y - tall), Color("0a0814"), 1.0)
+		x += 7.0
+		i += 1
+	draw_line(Vector2(x0, y - 6), Vector2(x1, y - 6), Color("0a0814"), 1.0)
+
+
+# ---------------------------------------------------------------- path & fog
 
 func _draw_path() -> void:
 	_stroke(STONE_DARK, 18.0)

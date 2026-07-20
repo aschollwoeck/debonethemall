@@ -81,8 +81,9 @@ final tuning is a playtest task.
 Replacing placeholder art with the crypt aesthetic (docs/art-direction.md), slice by slice. The
 **`Backdrop`** node (`world/backdrop.gd`, `z_index = -10`) draws the atmospheric world behind
 gameplay — a horizon strip (sky, sick moon, crypt spires) over a top-down dark graveyard field
-with drifting ground fog, plus the cobbled path with glowing rune-stones (given the enemy path
-via `setup()`). `main._draw()` now draws only the build-slot markers. Lighting/vignette (slice 2),
+(varied ground + macabre set-dressing: gravestones, skull piles, a summoning circle, braziers,
+…) with drifting ground fog, plus the cobbled path with glowing rune-stones (given the enemy
+path via `setup()`). Props are placed clear of the path and build slots. `main._draw()` now draws only the build-slot markers. Lighting/vignette (slice 2),
 re-arted sprites (slices 3–5), and the diegetic HUD (slice 6) follow.
 
 ## Core patterns

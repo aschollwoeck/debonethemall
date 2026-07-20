@@ -10,6 +10,11 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   silhouettes) over a top-down dark graveyard field with drifting ground fog, and a cobbled
   path with glowing rune-stones. Draws behind gameplay (`z_index -10`). First step toward the
   `docs/art-direction.md` target; lighting and re-arted sprites follow in later slices.
+- **M2 · Visual overhaul, slice 1b (atmosphere)** — kept the top-down camera (over a horizon
+  composition) and enriched the field: varied ground (soft blotches, cracks, moss clumps,
+  gravel) and a macabre set-dressing scatter — gravestones, dead trees, skull piles, staked
+  skulls, a necrotic summoning circle, braziers, blood pools, loose bones, a broken fence —
+  placed clear of the path and build slots. Their glow blooms in the lighting slice.
 
 ### Added
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
