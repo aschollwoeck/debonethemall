@@ -353,12 +353,14 @@ cross-arc combos and the ratios, during the balance pass.
   upgrades, plus a 3rd minion (Bound Wraith / Necrotic) & enemy (Wraith / Ethereal) with
   unlock gating. Runs finite. **Full spec: [`M1-core-systems.md`](./M1-core-systems.md).**
   *(Difficulty is a first pass — final balance is pending playtest.)*
-- **▶ M2 — Visual Overhaul (NEXT):** replace placeholder programmer-art with the agreed
-  **crazy-dark** aesthetic (necrotic-green default / witchfire-purple later acts) — layered
-  background, lighting pass, shaded minions & enemies, diegetic HUD. Systems unchanged.
-  **Art bible: [`art-direction.md`](./art-direction.md) · Spec: [`M2-visual-overhaul.md`](./M2-visual-overhaul.md).**
+- **✅ M2 — Visual Overhaul — DONE (superseded):** brought the crazy-dark aesthetic in-engine
+  (layered backdrop, lighting, shaded units, diegetic HUD) — but in a single low-res big-pixel
+  look that playtesting rejected. **Spec: [`M2-visual-overhaul.md`](./M2-visual-overhaul.md).**
+- **▶ M2b — Art Restyle (NEXT):** rebuild the rendering to **finer-pixel units on smooth painted
+  backgrounds, a clean vector UI, and a necromantic-sigil skill tree**. Design carries; rendering
+  approach changes. **Spec: [`M2b-restyle.md`](./M2b-restyle.md) · Art bible: [`art-direction.md`](./art-direction.md).**
 - **M3 — Act I content:** full Act I maps, enemy roster, story delivery, the slave framing —
-  built in the new visual style from the start.
+  built in the restyled look from the start.
 - **M4+ — Acts II & III, polish, audio, balance.**
 
 ---
