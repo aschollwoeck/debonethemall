@@ -1,0 +1,20 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="16" fill="#1a141f"/>
+  <!-- skull cranium -->
+  <path d="M64 22c-24 0-40 16-40 40 0 14 7 22 14 27v13a6 6 0 0 0 6 6h40a6 6 0 0 0 6-6V89c7-5 14-13 14-27 0-24-16-40-40-40z" fill="#e8e2d0"/>
+  <!-- eye sockets -->
+  <ellipse cx="46" cy="60" rx="11" ry="13" fill="#1a141f"/>
+  <ellipse cx="82" cy="60" rx="11" ry="13" fill="#1a141f"/>
+  <!-- glowing pupils -->
+  <circle cx="46" cy="61" r="4" fill="#6ee7a8"/>
+  <circle cx="82" cy="61" r="4" fill="#6ee7a8"/>
+  <!-- nasal cavity -->
+  <path d="M64 70l-6 12h12z" fill="#1a141f"/>
+  <!-- teeth -->
+  <g fill="#1a141f">
+    <rect x="50" y="98" width="4" height="10"/>
+    <rect x="58" y="98" width="4" height="12"/>
+    <rect x="66" y="98" width="4" height="12"/>
+    <rect x="74" y="98" width="4" height="10"/>
+  </g>
+</svg>

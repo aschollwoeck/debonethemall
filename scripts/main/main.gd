@@ -1,0 +1,192 @@
+extends Node2D
+## M0 orchestrator. Builds the world (fixed path, phylactery, build slots), spawns the HUD
+## and wave manager, handles minion placement/upgrades via clicks, and resolves win/lose.
+## See docs/M0-prototype.md.
+
+const ARCHER := preload("res://scripts/minions/bone_archer.gd")
+const GOLEM := preload("res://scripts/minions/bone_mill_golem.gd")
+
+const SLOT_RADIUS := 8.0
+const SLOT_CLICK_RADIUS := 12.0
+
+## Fixed enemy path (spawn off-screen left → phylactery on the right).
+var _path := PackedVector2Array([
+	Vector2(-20, 60), Vector2(100, 60), Vector2(100, 150), Vector2(200, 150),
+	Vector2(200, 60), Vector2(300, 60), Vector2(300, 210), Vector2(440, 210),
+])
+
+## Build slots beside the path. Each entry tracks its position and any placed minion.
+var _slots := [
+	Vector2(60, 110), Vector2(150, 105), Vector2(150, 190), Vector2(240, 110),
+	Vector2(255, 30), Vector2(340, 120), Vector2(255, 165), Vector2(360, 175),
+	Vector2(405, 160),
+]
+var _slot_minions: Array = []   # parallel to _slots; Minion or null
+
+var _phylactery: Phylactery
+var _waves: WaveManager
+var _hud: HUD
+var _selected_kind: String = ""
+var _game_over: bool = false
+
+
+func _ready() -> void:
+	_slot_minions.resize(_slots.size())
+	GameState.reset_run()
+
+	_phylactery = Phylactery.new()
+	_phylactery.global_position = _path[_path.size() - 1]
+	_phylactery.life_changed.connect(_on_life_changed)
+	_phylactery.destroyed.connect(_on_phylactery_destroyed)
+	add_child(_phylactery)
+
+	_waves = WaveManager.new()
+	add_child(_waves)
+	_waves.setup(_path, self, _phylactery)
+	_waves.wave_started.connect(_on_wave_started)
+	_waves.wave_cleared.connect(_on_wave_cleared)
+	_waves.all_waves_cleared.connect(_on_all_cleared)
+
+	_hud = HUD.new()
+	add_child(_hud)
+	_hud.minion_selected.connect(_on_minion_selected)
+	_hud.start_wave_pressed.connect(_on_start_wave)
+	_hud.retry_pressed.connect(_on_retry)
+
+	GameState.bone_dust_changed.connect(_on_dust_changed)
+	_on_dust_changed(GameState.bone_dust)
+	_on_life_changed(_phylactery.life, _phylactery.max_life)
+	_update_wave_hud()
+	queue_redraw()
+
+
+# ---------------------------------------------------------------- input / placement
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _game_over:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_try_click(get_global_mouse_position())
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		_selected_kind = ""
+		_hud.clear_selection()
+		queue_redraw()
+
+
+func _try_click(world_pos: Vector2) -> void:
+	var idx := _nearest_slot(world_pos)
+	if idx < 0:
+		return
+	if _slot_minions[idx] == null:
+		_try_place(idx)
+	else:
+		_try_upgrade(idx)
+
+
+func _nearest_slot(world_pos: Vector2) -> int:
+	for i in _slots.size():
+		if world_pos.distance_to(_slots[i]) <= SLOT_CLICK_RADIUS:
+			return i
+	return -1
+
+
+func _try_place(idx: int) -> void:
+	if _selected_kind == "":
+		return
+	var script: Script = ARCHER if _selected_kind == HUD.ARCHER else GOLEM
+	var minion: Minion = script.new()
+	if not GameState.try_spend(minion.cost):
+		minion.free()
+		return
+	minion.global_position = _slots[idx]
+	add_child(minion)
+	_slot_minions[idx] = minion
+	queue_redraw()
+
+
+func _try_upgrade(idx: int) -> void:
+	var minion: Minion = _slot_minions[idx]
+	if minion == null or not minion.can_upgrade():
+		return
+	if GameState.try_spend(minion.upgrade_cost):
+		minion.apply_upgrade()
+
+
+# ---------------------------------------------------------------- signal handlers
+
+func _on_minion_selected(kind: String) -> void:
+	_selected_kind = kind
+	queue_redraw()
+
+
+func _on_start_wave() -> void:
+	if not _game_over:
+		_waves.start_next_wave()
+		_update_wave_hud()
+
+
+func _on_retry() -> void:
+	get_tree().reload_current_scene()
+
+
+func _on_dust_changed(amount: int) -> void:
+	_hud.set_dust(amount)
+	queue_redraw()   # slot affordability tint
+
+
+func _on_life_changed(current: int, max_life: int) -> void:
+	_hud.set_life(current, max_life)
+
+
+func _on_wave_started(_index: int, _total: int) -> void:
+	_update_wave_hud()
+
+
+func _on_wave_cleared(_index: int) -> void:
+	_update_wave_hud()
+
+
+func _on_all_cleared() -> void:
+	if _game_over:
+		return
+	_game_over = true
+	_hud.show_end(true)
+
+
+func _on_phylactery_destroyed() -> void:
+	if _game_over:
+		return
+	_game_over = true
+	_hud.show_end(false)
+	get_tree().call_group("enemies", "queue_free")
+
+
+func _update_wave_hud() -> void:
+	_hud.set_wave(_waves.current_wave_number(), _waves.total_waves(), _waves.is_active())
+
+
+# ---------------------------------------------------------------- drawing (path + slots)
+
+func _draw() -> void:
+	# path: dark casing + bone-dust track
+	draw_polyline(_path, Color(0.10, 0.09, 0.12), 16.0)
+	draw_polyline(_path, Color(0.28, 0.24, 0.20), 11.0)
+	# build slots
+	var can_afford_selected := _selected_affordable()
+	for i in _slots.size():
+		var p: Vector2 = _slots[i]
+		if _slot_minions[i] != null:
+			continue   # occupied: the minion draws itself
+		var fill := Color(1, 1, 1, 0.05)
+		var edge := Color(1, 1, 1, 0.22)
+		if _selected_kind != "":
+			edge = Color(0.5, 0.95, 0.6, 0.7) if can_afford_selected else Color(0.9, 0.4, 0.4, 0.6)
+		draw_circle(p, SLOT_RADIUS, fill)
+		draw_arc(p, SLOT_RADIUS, 0, TAU, 24, edge, 1.0)
+
+
+func _selected_affordable() -> bool:
+	if _selected_kind == "":
+		return false
+	var cost := 50 if _selected_kind == HUD.ARCHER else 80
+	return GameState.can_afford(cost)
