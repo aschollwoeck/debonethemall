@@ -12,8 +12,8 @@ waves to win; if the phylactery's life hits zero, the run ends.
 
 ## Currencies
 - **Bone Dust** — earned from kills, spent during a run to raise/upgrade minions. Resets each run.
-- **Grave Bones** *(planned, M1)* — persistent currency banked between runs, spent on the meta
-  skill tree.
+- **Grave Bones** — persistent currency spent on the meta skill tree in the Crypt (already
+  spendable). *Earning* them by harvesting from runs is still being wired (planned, M1).
 
 ## The counter system
 Every minion deals a **damage type**; every enemy has an **armor type**. The multiplier decides
@@ -51,8 +51,26 @@ Each minion has **one upgrade** in M0; **branching upgrades** (two specializatio
 **Deboning** is HP-threshold based: enemies visibly fall apart in stages as they take damage,
 and some changes are mechanical (the grunt's crawler stage moves slower).
 
+## The Crypt (Hub) *(M1)*
+The game opens in **The Crypt** — your meta screen. Here you spend **Grave Bones** on the
+**skill tree** (unlocking minions and permanent buffs), then press **Begin Run** to play. When
+a run ends (win or lose), you **Return to Crypt** to spend and try again.
+
+*Still being wired (planned, M1):* tree purchases don't affect runs yet — buffs and
+minion-unlock gating aren't applied in-game, and harvesting Grave Bones from a run into the
+Crypt isn't hooked up. Right now the Crypt is navigable and saves your purchases, but the
+payoff lands in a later M1 feature.
+
 ## Controls
+**In the Crypt (Hub):**
+- **Click a tree node** to buy it (if affordable and its prerequisite is owned). Node colors:
+  **bone/cream** = affordable now (shows its cost), **green** = owned, **amber** = you can't
+  afford it yet, **grey** = locked (prerequisite not owned).
+- **Begin Run** starts a run.
+
+**In a run:**
 - **Select a minion** (bottom-left buttons), then **click a build slot** to raise it.
 - **Click a placed minion** to buy its upgrade.
 - **Right-click** cancels the current selection.
 - **Start Wave** (bottom-right) sends the next wave.
+- **Return to Crypt** (on the end screen) returns to the Hub.

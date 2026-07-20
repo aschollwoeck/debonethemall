@@ -5,6 +5,9 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Added
+- **M1 · Hub ("The Crypt")** — new entry scene with a container-based skill-tree UI (buy nodes
+  → spend Grave Bones → autosave) and **Begin Run**. Scene routing Hub → run → Hub (the run's
+  end screen now offers **Return to Crypt** instead of an in-place retry).
 - **M1 · Skill tree** — data-driven `SkillTree` autoload: 10 node definitions (minion unlocks +
   global buffs) with costs/prereqs, purchase gating via `MetaState`, and `RunModifiers`
   aggregation applied at run start. Unit tests cover data integrity, purchase gating, and

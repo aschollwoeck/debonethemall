@@ -5,7 +5,7 @@ class_name HUD
 
 signal minion_selected(kind: String)
 signal start_wave_pressed
-signal retry_pressed
+signal return_to_hub_pressed
 
 const ARCHER := "archer"
 const GOLEM := "golem"
@@ -102,9 +102,9 @@ func _build_end_panel() -> void:
 	vbox.add_child(_end_label)
 
 	var retry := Button.new()
-	retry.text = "Rise Again"
+	retry.text = "Return to Crypt"
 	retry.focus_mode = Control.FOCUS_NONE
-	retry.pressed.connect(func(): retry_pressed.emit())
+	retry.pressed.connect(func(): return_to_hub_pressed.emit())
 	vbox.add_child(retry)
 
 	_end_panel.visible = false

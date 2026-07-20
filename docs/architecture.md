@@ -24,8 +24,10 @@ scripts/
   meta/     skill_tree.gd      — SkillTree autoload: node data, purchase, run-modifier aggregation
             run_modifiers.gd   — RunModifiers value object (aggregated tree effects for a run)
   ui/       hud.gd             — code-built HUD (labels, buttons, end panel)
-  main/     main.gd            — M0 orchestrator (world build, placement, win/lose)
-scenes/     main/main.tscn     — entry scene (thin: just the Main node + script)
+  hub/      hub.gd             — Hub ("The Crypt") screen: skill-tree UI, purchasing, Begin Run
+  main/     main.gd            — run orchestrator (world build, placement, win/lose)
+scenes/     hub/hub.tscn       — entry scene (the Hub)
+            main/main.tscn     — the run scene (thin: just the Main node + script)
 tests/unit/                    — GUT tests
 addons/gut/                    — vendored test framework
 docs/                          — design + technical + player docs
@@ -44,9 +46,19 @@ docs/                          — design + technical + player docs
 - **`SkillTree`** — data-driven meta skill tree (GDD §7/§10). Holds node definitions (`NODES`:
   id → name/desc/cost/prereqs/effect), gates purchases via `MetaState` (`can_purchase`/`purchase`), and
   aggregates unlocked nodes into a `RunModifiers` (unlocked minions + global buffs) that a run
-  reads at start via `build_run_modifiers()`. No UI — the Hub (M1-F3) renders it.
+  reads at start via `build_run_modifiers()`. Has no UI of its own — the Hub renders it.
+
+## Scene flow
+`hub.tscn` (entry) → **Begin Run** → `change_scene_to_file(main.tscn)` (a run) → win/lose →
+**Return to Crypt** → back to `hub.tscn`. Autoloads (`MetaState`, `SkillTree`, …) persist across
+these scene changes, so meta progress carries over. Applying the tree's `RunModifiers` to a run
+and banking harvest on run-end are wired by later M1 features.
 
 ## Core patterns
+- **Container UI vs. absolute UI:** the **Hub** uses Godot container nodes (`MarginContainer` /
+  `VBox` / `HBox`) for auto-layout — robust against the anchor-preset-plus-manual-`.position` bug
+  that once made HUD controls invisible. The in-run **HUD** uses absolute positions (safe only
+  because the run viewport is a fixed 480×270). Prefer containers for any non-trivial layout.
 - **Code-driven world:** `main.gd` builds the path, phylactery, build slots, wave manager, and
   HUD in `_ready()` rather than composing a big `.tscn`. Keeps scenes un-fragile and lets us
   verify by running.
