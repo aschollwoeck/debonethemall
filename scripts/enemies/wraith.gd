@@ -7,7 +7,7 @@ const GHOST := Color("9be7a0")
 
 
 func _ready() -> void:
-	max_hp = 28.0
+	max_hp = 60.0
 	armor_type = CombatTypes.Armor.ETHEREAL
 	move_speed = 42.0
 	reward = 10

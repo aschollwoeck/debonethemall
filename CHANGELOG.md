@@ -5,6 +5,12 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Added
+- **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
+  branches (Archer: Volley/Piercer · Golem: Wider Grind/Bone Crusher · Wraith: Reaper/Warden),
+  chosen via a HUD popup; a second tier deepens the branch. Minion attacks flow through
+  `_fire(target_list)` to support multi-target (Volley). Enemy HP raised as a first-pass
+  difficulty bump so counters matter (final balance is a playtest task). Tests for branch
+  progression, per-tier costs, and branch-locking.
 - **M1 · Bound Wraith, Wraith enemy & unlock gating** — a third minion (**Bound Wraith**,
   Necrotic) and enemy (**Wraith**, Ethereal) whose armor resists all physical, so it *demands*
   Necrotic (matrix tweaked: Pierce vs Ethereal → 0.5, so all physical is ×0.5). Minion-unlock **gating** is now

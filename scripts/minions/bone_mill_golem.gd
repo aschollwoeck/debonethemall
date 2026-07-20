@@ -15,7 +15,6 @@ func _ready() -> void:
 	attack_rate = 0.7
 	attack_range = 52.0
 	cost = 80
-	upgrade_cost = 90
 	projectile_color = STONE
 
 
@@ -26,8 +25,8 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 
 
-## AoE: grind every enemy currently in range.
-func _attack(_target: Enemy) -> void:
+## AoE: grind every enemy currently in range (ignores the target list — hits all).
+func _fire(_target_list: Array) -> void:
 	var hit_any := false
 	for e in get_tree().get_nodes_in_group("enemies"):
 		var enemy := e as Enemy
@@ -39,6 +38,25 @@ func _attack(_target: Enemy) -> void:
 	if hit_any:
 		_pulse = 1.0
 		queue_redraw()
+
+
+## Wider Grind — bigger AoE radius · Bone Crusher — heavier damage & cadence.
+func _branches() -> Dictionary:
+	return {
+		"a": {"name": "Wider Grind", "cost1": 90, "cost2": 140},
+		"b": {"name": "Bone Crusher", "cost1": 90, "cost2": 140},
+	}
+
+
+func _apply_branch(id: String, t: int) -> void:
+	if id == "a":            # Wider Grind: radius (and a little damage at II)
+		attack_range *= 1.3
+		if t == 2:
+			damage *= 1.2
+	else:                    # Bone Crusher: damage (and faster grind at II)
+		damage *= 1.8 if t == 1 else 1.6
+		if t == 2:
+			attack_rate *= 1.25
 
 
 func _draw() -> void:

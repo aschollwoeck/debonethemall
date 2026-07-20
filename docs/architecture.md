@@ -23,7 +23,7 @@ scripts/
   minions/  minion.gd (base) + bone_archer.gd, bone_mill_golem.gd, bound_wraith.gd, projectile.gd
   meta/     skill_tree.gd      — SkillTree autoload: node data, purchase, run-modifier aggregation
             run_modifiers.gd   — RunModifiers value object (aggregated tree effects for a run)
-  ui/       hud.gd             — code-built HUD (labels, buttons, end panel)
+  ui/       hud.gd             — code-built HUD (labels, buttons, end panel, upgrade popup)
   hub/      hub.gd             — Hub ("The Crypt") screen: skill-tree UI, purchasing, Begin Run
   main/     main.gd            — run orchestrator (world build, placement, win/lose)
 scenes/     hub/hub.tscn       — entry scene (the Hub)
@@ -64,7 +64,17 @@ The full loop is closed:
 - **Run end (win or lose):** `_finish_run()` banks the harvest via `MetaState.bank_harvest()`
   (×1.5 on a clear), autosaves, and shows the banked total on the end screen.
 
-Not yet wired (later M1): branching upgrades and a difficulty/balance pass.
+## Minion upgrades (branching)
+Each `Minion` upgrades along one of two branches (GDD §7): the first upgrade picks branch `"a"`
+or `"b"` (tier 1), a second deepens it (tier 2), and the choice locks. Subclasses declare their
+branches in `_branches()` (names + per-tier costs) and mutate the stat block in `_apply_branch()`;
+the base class handles `upgrade_options()`, `cost_of()`, and `apply_upgrade_choice()`. Clicking a
+placed minion opens the HUD branch popup (`hud.show_upgrades` → `upgrade_chosen`); `main` spends
+Bone Dust and re-opens for the next tier. Attacks flow through `_fire(target_list)` so a minion
+can hit multiple enemies (e.g. the Archer's *Volley* raises `targets`).
+
+*Balance:* enemy HP was raised as a first-pass difficulty bump so the counter matrix bites;
+final tuning is a playtest task.
 
 ## Core patterns
 - **Container UI vs. absolute UI:** the **Hub** uses Godot container nodes (`MarginContainer` /
@@ -84,7 +94,7 @@ Not yet wired (later M1): branching upgrades and a difficulty/balance pass.
   pick the target furthest along the path (`Enemy.get_progress()`).
 
 ## Combat flow (one hit)
-`Minion._attack()` → `Projectile` (or AoE) → `Enemy.take_damage(base, type)` →
+`Minion._fire(target_list)` → `Projectile` (or AoE) → `Enemy.take_damage(base, type)` →
 `CombatTypes.resolve_damage(base, type, armor)` → HP drop → `_update_stage()` crosses a debone
 threshold (visual/behaviour change) → death (`died` → Bone Dust + Grave Bones harvest) or leak
 (`reached_end` → phylactery damage).

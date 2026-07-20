@@ -7,7 +7,7 @@ const DARK := Color("1a141f")
 
 
 func _ready() -> void:
-	max_hp = 34.0
+	max_hp = 70.0
 	armor_type = CombatTypes.Armor.BONE
 	move_speed = 34.0
 	reward = 8
