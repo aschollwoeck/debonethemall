@@ -348,8 +348,10 @@ cross-arc combos and the ratios, during the balance pass.
 - **M0 — Prototype (prove the fun):** one map, fixed path, **2 minions** (Bone Archer /
   Bone-Mill Golem), **2 enemies** (grunt / dog) with debone stages, a 5-wave sequence,
   in-run economy, win/lose. No meta. **Full spec: [`M0-prototype.md`](./M0-prototype.md).**
-- **M1 — Core systems:** in-run upgrades + branching, save/load, the meta skill tree
-  skeleton (pun intended), currency harvesting.
+- **M1 — Core systems:** the persistent meta loop — Hub screen, Grave Bones currency,
+  save/load, meta skill tree (minion unlocks + buffs), in-run branching upgrades, plus a
+  3rd minion (Bound Wraith / Necrotic) & enemy (Wraith / Ethereal). Runs finite but hard.
+  **Full spec: [`M1-core-systems.md`](./M1-core-systems.md).**
 - **M2 — Act I content:** full Act I maps, enemy roster, story delivery, the slave framing.
 - **M3+ — Acts II & III, polish, audio, balance.**
 
