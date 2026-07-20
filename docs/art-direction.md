@@ -106,8 +106,11 @@ How this gets built (for the overhaul):
   back-to-front per §8.
 - **Sprites**: keep the code-driven `_draw()` approach for now (shaded, per §6) so we can iterate
   without an asset pipeline; graduate to `Sprite2D`/`AnimatedSprite2D` if/when we commission real art.
-- **Lighting**: an additive pass — `Light2D` + a soft vignette (`CanvasModulate` / a dark overlay).
-  The **act accent** is one exported color that tints the lights and glow sprites.
+- **Lighting** *(implemented, slice 2)*: a code-driven additive pass — a soft radial glow
+  texture drawn per light source through an additive `CanvasItemMaterial` (`world/lighting.gd`,
+  `z 5`), plus a dark radial `Vignette` overlay (`world/vignette.gd`, `z 8`), both under the HUD
+  CanvasLayer. The **act accent** is one exported `Color` tinting the necrotic lights (braziers
+  stay amber). (Chose this over `Light2D`/`CanvasModulate` for precise, predictable control.)
 - **Atmosphere**: cheap animated shaders/particles for fog drift, embers, motes, pulse.
 - **HUD**: container-based Control UI (per `architecture.md`) styled to §10.
 

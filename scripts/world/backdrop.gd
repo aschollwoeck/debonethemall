@@ -43,6 +43,11 @@ const FOG_COLOR := Color(0.55, 0.62, 0.58, 0.028)
 ## Crypt spires along the horizon: [x, height].
 const SPIRES := [[28, 40], [44, 54], [58, 30], [150, 26], [300, 34], [408, 44], [430, 58], [452, 34]]
 
+# Light-source anchors (single source of truth for both the props and the lighting pass, §slice 2).
+const BRAZIERS := [Vector2(84, 88), Vector2(318, 190)]
+const SUMMON := Vector2(236, 246)
+const SUMMON_R := 15.0
+
 var _path: PackedVector2Array
 var _stars: Array = []
 var _speckles: Array = []       # {p:Vector2, c:Color, s:int}  (s = pixel size)
@@ -62,6 +67,13 @@ func setup(path_points: PackedVector2Array) -> void:
 	_path = path_points
 	_generate()
 	queue_redraw()
+
+
+# Light-source accessors for the lighting pass (world/lighting.gd).
+func brazier_points() -> Array: return BRAZIERS
+func summon_point() -> Vector2: return SUMMON
+func summon_radius() -> float: return SUMMON_R
+func rune_points() -> Array: return _runes
 
 
 func _generate() -> void:
@@ -174,8 +186,9 @@ func _draw_props() -> void:
 	# macabre kit (docs/art-direction.md §9)
 	_skull_pile(72, 256); _skull_pile(432, 236)
 	_staked_skull(30, 178); _staked_skull(452, 150)
-	_summon_circle(236, 246, 15)
-	_brazier(84, 88); _brazier(318, 190)
+	_summon_circle(SUMMON.x, SUMMON.y, SUMMON_R)
+	for b in BRAZIERS:
+		_brazier(b.x, b.y)
 	_blood(412, 186); _blood(150, 250)
 	_bones(44, 158); _bones(196, 250)
 	_fence(4, 96, 266)

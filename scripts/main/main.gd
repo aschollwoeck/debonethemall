@@ -64,6 +64,12 @@ func _ready() -> void:
 	_phylactery.destroyed.connect(_on_phylactery_destroyed)
 	add_child(_phylactery)
 
+	# Lighting pass (additive glows) + heavy vignette. M2 slice 2.
+	var lighting := Lighting.new()
+	add_child(lighting)
+	lighting.setup(_phylactery.global_position, backdrop)
+	add_child(Vignette.new())
+
 	_waves = WaveManager.new()
 	add_child(_waves)
 	_waves.setup(_path, self, _phylactery)
