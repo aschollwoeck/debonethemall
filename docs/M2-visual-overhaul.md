@@ -45,13 +45,16 @@ one map we have look *right* before Act I content (M3) is built in the new style
   `Sprite2D`/`AnimatedSprite2D` is a later call (art-direction §11).
 - Balance (M1 first-pass difficulty stands until a dedicated tuning pass).
 
-## Success criteria
-- [ ] The running game visibly matches the mockup's mood — layered depth, one eerie light source, oppressive dark, macabre props.
-- [ ] Necrotic-green default with a working **act-accent** hook (a later act can switch to witchfire purple with one value).
-- [ ] All three minions and three enemies read by **silhouette**; debone stages are legible and characterful.
-- [ ] The HUD is diegetic and still fully functional (all M0/M1 controls work).
-- [ ] Runs at 60 fps; no gameplay/logic regression (full test suite green).
-- [ ] Placeholder `_draw()` shapes are gone from the shipped visuals.
+## Success criteria — ✅ met (M2 complete, 2026-07)
+- [x] The running game visibly matches the mockup's mood — layered depth, one eerie light source, oppressive dark, macabre props.
+- [x] Necrotic-green default with a working **act-accent** hook (a later act can switch to witchfire purple with one value).
+- [x] All three minions and three enemies read by **silhouette**; debone stages are legible and characterful.
+- [x] The HUD is diegetic and still fully functional (all M0/M1 controls work).
+- [x] Runs at 60 fps; no gameplay/logic regression (full test suite green).
+- [x] Placeholder `_draw()` shapes are gone from the shipped visuals.
+
+> Shipped across slices 1, 1b, 2, 3, 4, 5, 6 (PRs #10–#16). Slice 7's macabre prop kit was
+> folded into **slice 1b** rather than shipped separately.
 
 ## Technical notes (Godot)
 - Prefer a **prerendered/layered background** (parallax layers or stacked draws) over redrawing
@@ -70,5 +73,5 @@ Follow the slice order above; each is a feature branch + PR, self-reviewed by th
 
 ---
 
-*When M2's success criteria are met, promote learnings into `art-direction.md` and scope M3 (Act I
-content) — built in the new style from the first sprite.*
+*✅ Done. M2's learnings are reflected in `art-direction.md` (marked implemented). Next up: scope
+M3 (Act I content) — built in the new style from the first sprite.*

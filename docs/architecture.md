@@ -79,8 +79,8 @@ can hit multiple enemies (e.g. the Archer's *Volley* raises `targets`).
 *Balance:* enemy HP was raised as a first-pass difficulty bump so the counter matrix bites;
 final tuning is a playtest task.
 
-## Visuals (M2 overhaul, in progress)
-Replacing placeholder art with the crypt aesthetic (docs/art-direction.md), slice by slice. The
+## Visuals (M2 overhaul — complete)
+Replaced the placeholder art with the crypt aesthetic (docs/art-direction.md). The
 **`Backdrop`** node (`world/backdrop.gd`, `z_index = -10`) draws the atmospheric world behind
 gameplay — a horizon strip (sky, sick moon, crypt spires) over a top-down dark graveyard field
 (varied ground + macabre set-dressing: gravestones, skull piles, a summoning circle, braziers,
@@ -94,7 +94,9 @@ necrotic motes, from a procedurally-generated glow texture; its `accent` color i
 signature glow** (green default, one value → witchfire purple later). The **`Vignette`** node
 (`world/vignette.gd`, `z 8`) crushes the edges to dark. Both sit under the HUD `CanvasLayer`.
 
-Re-arted sprites (slices 3–5) and the diegetic HUD (slice 6) follow.
+The re-arted sprites (phylactery, minions, enemies + debone stages) and the **diegetic HUD**
+(`ui/hud.gd` — carved bone/stone plaques, a green→red life meter, gothic panels) are in. **M2 is
+complete**: no placeholder programmer-art remains in a run.
 
 ## Core patterns
 - **Container UI vs. absolute UI:** the **Hub** uses Godot container nodes (`MarginContainer` /

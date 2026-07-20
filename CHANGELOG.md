@@ -34,6 +34,11 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   headless crawler with its popped-off skull grinning behind it → bone pile), **Skeletal Dog**
   (running hound → two sliding halves), **Wraith** (hooded ghost → tattered → fading wisp). The
   macabre debone slapstick (GDD §6, art-direction §7) now reads.
+- **M2 · Visual overhaul, slice 6 (diegetic HUD)** — restyled the in-run HUD to be *made of the
+  world* (art-direction §10): carved bone/stone plaques for the Bone Dust / Wave / Harvest
+  readouts, a **green→red phylactery life meter**, carved-stone buttons with an accent glow when
+  active, and gothic bone-framed panels for the upgrade popup and end screen. Public API
+  unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
