@@ -65,8 +65,8 @@ func _build_sigil() -> void:
 		_sigil_nodes.append({"id": ids[1], "pos": CENTER + dir * R_OUTER, "route": i, "tier": 1})
 
 
-## Title / balance / Begin — real Controls (top & bottom), clear of the sigil. They ignore mouse
-## so the sigil area's clicks reach this Control's `_gui_input` (the Begin button keeps its own).
+## Title / balance / level bar — real Controls (top & bottom), clear of the sigil. The Labels
+## ignore mouse so sigil-area clicks reach `_gui_input`; the level chips (Buttons) keep their own.
 func _build_chrome() -> void:
 	# NB: the sigil is drawn in this Control's own _draw(); child Controls render on top of it, so
 	# the background is painted in _draw() (not an opaque child, which would hide the sigil).
@@ -356,6 +356,3 @@ func _enter_level(index: int) -> void:
 		return
 	RunContext.select(lvl, index)
 	get_tree().change_scene_to_file(RUN_SCENE)
-
-
-
