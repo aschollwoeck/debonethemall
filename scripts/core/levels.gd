@@ -1,10 +1,9 @@
 extends Node
-## Autoload singleton (Levels). The level registry (M3, docs/M3-act-one.md): Act I's ordered maps.
-## Level 1 is the real, tuned content lifted out of the old hardcoded `main.gd` / `WaveManager`.
-##
-## Levels 2–5 and the boss are **placeholders** for now — they reuse Level 1's path/slots with
-## escalating wave counts so the progression (Continue / replay / act clear) is fully playable
-## end-to-end; the real crypt maps land in M3 slice 6 and the boss in slice 7.
+## Autoload singleton (Levels). The level registry (M3, docs/M3-act-one.md): Act I's five crypt
+## maps + the boss, each with its own **path**, **build slots**, and **wave composition**. The roster
+## is introduced gradually across the act — grunts/dogs → Skeleton Mage → Armored Knight → Wraith →
+## Raised Necromancer — so each map teaches a new counter. (The Master boss enemy lands in slice 7;
+## the boss map here is the pre-boss gauntlet.) Wave difficulty is a first pass — tuned in slice 8.
 
 const GRUNT := preload("res://scripts/enemies/skeleton_grunt.gd")
 const DOG := preload("res://scripts/enemies/skeletal_dog.gd")
@@ -13,24 +12,174 @@ const MAGE := preload("res://scripts/enemies/skeleton_mage.gd")
 const KNIGHT := preload("res://scripts/enemies/armored_knight.gd")
 const NECRO := preload("res://scripts/enemies/raised_necromancer.gd")
 
-# --- Level 1 geometry (the original prototype map) ---
-# (PATH1 is a `var`, not `const`: a PackedVector2Array literal isn't a constant expression.)
+# --- paths (PackedVector2Array literals aren't const-expressions, so `var`) ---
+# spawn off-screen → wind through the crypt → phylactery at the last point.
 var PATH1 := PackedVector2Array([
 	Vector2(-20, 60), Vector2(100, 60), Vector2(100, 150), Vector2(200, 150),
-	Vector2(200, 60), Vector2(300, 60), Vector2(300, 210), Vector2(440, 210),
-])
+	Vector2(200, 60), Vector2(300, 60), Vector2(300, 210), Vector2(440, 210)])
+var PATH2 := PackedVector2Array([
+	Vector2(-20, 60), Vector2(380, 60), Vector2(380, 150), Vector2(90, 150),
+	Vector2(90, 230), Vector2(460, 230)])
+var PATH3 := PackedVector2Array([
+	Vector2(-20, 40), Vector2(440, 40), Vector2(440, 225), Vector2(60, 225),
+	Vector2(60, 115), Vector2(345, 115), Vector2(345, 170), Vector2(185, 170)])
+var PATH4 := PackedVector2Array([
+	Vector2(240, -20), Vector2(240, 70), Vector2(60, 70), Vector2(60, 170),
+	Vector2(420, 170), Vector2(420, 90), Vector2(300, 90), Vector2(300, 140)])
+var PATH5 := PackedVector2Array([
+	Vector2(-20, 225), Vector2(110, 225), Vector2(110, 60), Vector2(230, 60),
+	Vector2(230, 190), Vector2(350, 190), Vector2(350, 60), Vector2(460, 60)])
+var PATH_BOSS := PackedVector2Array([
+	Vector2(-20, 40), Vector2(440, 40), Vector2(440, 230), Vector2(40, 230),
+	Vector2(40, 135), Vector2(240, 135)])
+
 const SLOTS1 := [
 	Vector2(60, 110), Vector2(150, 105), Vector2(150, 190), Vector2(240, 110),
-	Vector2(255, 30), Vector2(340, 120), Vector2(255, 165), Vector2(360, 175),
-	Vector2(405, 160),
-]
+	Vector2(255, 30), Vector2(340, 120), Vector2(255, 165), Vector2(360, 175), Vector2(405, 160)]
+const SLOTS2 := [
+	Vector2(60, 95), Vector2(160, 95), Vector2(260, 95), Vector2(340, 100),
+	Vector2(150, 120), Vector2(300, 120), Vector2(150, 190), Vector2(300, 190), Vector2(410, 200)]
+const SLOTS3 := [
+	Vector2(120, 75), Vector2(240, 75), Vector2(360, 75), Vector2(400, 150),
+	Vector2(120, 150), Vector2(250, 145), Vector2(120, 195), Vector2(260, 200), Vector2(405, 195)]
+const SLOTS4 := [
+	Vector2(120, 40), Vector2(160, 110), Vector2(280, 110), Vector2(380, 120),
+	Vector2(120, 200), Vector2(240, 200), Vector2(360, 200), Vector2(200, 120), Vector2(340, 60)]
+const SLOTS5 := [
+	Vector2(55, 130), Vector2(165, 120), Vector2(165, 220), Vector2(290, 120),
+	Vector2(290, 220), Vector2(415, 120), Vector2(80, 90), Vector2(200, 90), Vector2(320, 90)]
+const SLOTS_BOSS := [
+	Vector2(110, 75), Vector2(230, 75), Vector2(350, 75), Vector2(400, 180),
+	Vector2(120, 180), Vector2(240, 180), Vector2(150, 110), Vector2(330, 110), Vector2(240, 100)]
 
 ## Act I's ordered levels (built at boot). Index 0 = Level 1.
 var act1: Array = []
 
-## Act I dialogue (M3 slice 2). Cruel-but-funny Master vs. the slave's simmering inner voice,
-## escalating toward the turn. A beat is {who, name, line}; keyed by level id. Pure string data
-## (const-safe). Slave lines ("you") build resentment → resolve; the Master's ("master") sneer.
+
+func _ready() -> void:
+	act1 = [
+		Level.new("act1_l1", "The Crypt Approach", PATH1, SLOTS1, _l1()),
+		Level.new("act1_l2", "The Ossuary", PATH2, SLOTS2, _l2()),
+		Level.new("act1_l3", "The Flooded Vault", PATH3, SLOTS3, _l3()),
+		Level.new("act1_l4", "The Reliquary", PATH4, SLOTS4, _l4()),
+		Level.new("act1_l5", "The Master's Gate", PATH5, SLOTS5, _l5()),
+		Level.new("act1_boss", "The Master", PATH_BOSS, SLOTS_BOSS, _boss(), true),
+	]
+	_attach_story()
+
+
+## Wires each level's dialogue beats from STORY (M3 slice 2). Keeps writing in one place.
+func _attach_story() -> void:
+	for lvl in act1:
+		var beats: Dictionary = STORY.get(lvl.id, {})
+		lvl.intro = beats.get("intro", [])
+		lvl.outro = beats.get("outro", [])
+
+
+# ---------------------------------------------------------------- registry helpers
+
+func act1_count() -> int:
+	return act1.size()
+
+
+func act1_level(index: int) -> Level:
+	return act1[index] if index >= 0 and index < act1.size() else null
+
+
+## Index of the next uncleared Act I level (for a future "Continue"); clamps to the last.
+func act1_next_index() -> int:
+	for i in act1.size():
+		if not MetaState.is_level_cleared(act1[i].id):
+			return i
+	return act1.size() - 1
+
+
+## True if the level at `index` is playable: the first level, or the previous one is cleared.
+func is_act1_unlocked(index: int) -> bool:
+	if index <= 0:
+		return true
+	if index >= act1.size():
+		return false
+	return MetaState.is_level_cleared(act1[index - 1].id)
+
+
+# ---------------------------------------------------------------- wave composition
+# One group = {script, count, interval, delay}. Roster is introduced across the act; wave sizes are
+# a first pass (slice 8 tunes). Wraiths (need Bound Wraith) and knights (want the Golem) appear once
+# the player has had a chance to farm the sigil for those unlocks (GDD §10 cross-farming).
+
+func _g(script: Script, count: int, interval: float, delay: float) -> Dictionary:
+	return {"script": script, "count": count, "interval": interval, "delay": delay}
+
+
+## L1 — The Crypt Approach: pure fodder, teaches Archer vs. dogs / Golem vs. grunts.
+func _l1() -> Array:
+	return [
+		[_g(GRUNT, 4, 0.9, 0.0)],
+		[_g(GRUNT, 3, 0.8, 0.0), _g(DOG, 3, 0.7, 2.0)],
+		[_g(DOG, 5, 0.6, 0.0)],
+		[_g(GRUNT, 6, 0.7, 0.0), _g(DOG, 3, 0.7, 3.0)],
+		[_g(GRUNT, 8, 0.6, 0.0), _g(DOG, 5, 0.5, 2.0)],
+	]
+
+
+## L2 — The Ossuary: denser, faster fodder.
+func _l2() -> Array:
+	return [
+		[_g(GRUNT, 5, 0.8, 0.0), _g(DOG, 2, 0.7, 2.0)],
+		[_g(DOG, 6, 0.5, 0.0)],
+		[_g(GRUNT, 6, 0.7, 0.0), _g(DOG, 4, 0.6, 2.0)],
+		[_g(GRUNT, 8, 0.6, 0.0), _g(DOG, 5, 0.5, 3.0)],
+		[_g(GRUNT, 10, 0.5, 0.0), _g(DOG, 7, 0.45, 2.0)],
+	]
+
+
+## L3 — The Flooded Vault: introduces the Skeleton Mage (ranged; kill it before it sets up).
+func _l3() -> Array:
+	return [
+		[_g(GRUNT, 5, 0.8, 0.0), _g(DOG, 3, 0.6, 2.0)],
+		[_g(GRUNT, 6, 0.7, 0.0), _g(MAGE, 1, 2.0, 4.0)],
+		[_g(DOG, 7, 0.5, 0.0), _g(MAGE, 1, 2.0, 3.0)],
+		[_g(GRUNT, 8, 0.6, 0.0), _g(DOG, 4, 0.5, 2.0), _g(MAGE, 2, 2.0, 5.0)],
+		[_g(GRUNT, 10, 0.55, 0.0), _g(DOG, 6, 0.45, 2.0), _g(MAGE, 2, 2.0, 6.0)],
+	]
+
+
+## L4 — The Reliquary: introduces the Armored Knight (crack the plate) and the first Wraiths.
+func _l4() -> Array:
+	return [
+		[_g(GRUNT, 6, 0.7, 0.0), _g(KNIGHT, 1, 3.0, 3.0)],
+		[_g(DOG, 7, 0.5, 0.0), _g(MAGE, 2, 2.0, 3.0)],
+		[_g(GRUNT, 8, 0.6, 0.0), _g(KNIGHT, 1, 3.0, 3.0), _g(WRAITH, 1, 2.0, 6.0)],
+		[_g(GRUNT, 8, 0.6, 0.0), _g(DOG, 5, 0.5, 2.0), _g(MAGE, 2, 2.0, 5.0), _g(KNIGHT, 2, 3.0, 7.0)],
+		[_g(GRUNT, 10, 0.5, 0.0), _g(DOG, 6, 0.45, 2.0), _g(MAGE, 2, 2.0, 5.0), _g(KNIGHT, 2, 3.0, 7.0), _g(WRAITH, 2, 2.0, 9.0)],
+	]
+
+
+## L5 — The Master's Gate: the Raised Necromancer miniboss + the full roster.
+func _l5() -> Array:
+	return [
+		[_g(GRUNT, 8, 0.6, 0.0), _g(KNIGHT, 1, 3.0, 3.0)],
+		[_g(DOG, 8, 0.5, 0.0), _g(MAGE, 2, 2.0, 3.0), _g(WRAITH, 1, 2.0, 6.0)],
+		[_g(GRUNT, 8, 0.6, 0.0), _g(KNIGHT, 2, 3.0, 4.0), _g(NECRO, 1, 1.0, 8.0)],
+		[_g(GRUNT, 10, 0.55, 0.0), _g(DOG, 6, 0.45, 2.0), _g(MAGE, 3, 2.0, 5.0), _g(KNIGHT, 2, 3.0, 7.0)],
+		[_g(GRUNT, 12, 0.5, 0.0), _g(DOG, 8, 0.4, 2.0), _g(MAGE, 3, 2.0, 5.0), _g(KNIGHT, 2, 3.0, 7.0), _g(NECRO, 1, 1.0, 10.0), _g(WRAITH, 2, 2.0, 9.0)],
+	]
+
+
+## Boss map — the pre-boss gauntlet (The Master enemy is added in slice 7).
+func _boss() -> Array:
+	return [
+		[_g(GRUNT, 10, 0.5, 0.0), _g(KNIGHT, 2, 3.0, 3.0)],
+		[_g(DOG, 10, 0.4, 0.0), _g(MAGE, 3, 2.0, 3.0), _g(WRAITH, 2, 2.0, 6.0)],
+		[_g(GRUNT, 12, 0.5, 0.0), _g(KNIGHT, 3, 3.0, 4.0), _g(NECRO, 1, 1.0, 8.0), _g(MAGE, 3, 2.0, 6.0)],
+	]
+
+
+# ---------------------------------------------------------------- story (M3 slice 2)
+
+## Act I dialogue. Cruel-but-funny Master vs. the slave's simmering inner voice, escalating toward
+## the turn. A beat is {who, name, line}; keyed by level id. Pure string data (const-safe).
 const STORY := {
 	"act1_l1": {
 		"intro": [
@@ -83,104 +232,3 @@ const STORY := {
 		],
 	},
 }
-
-
-func _ready() -> void:
-	var base := _base_waves()
-	act1 = [
-		Level.new("act1_l1", "The Crypt Approach", PATH1, SLOTS1, base),
-		Level.new("act1_l2", "The Ossuary", PATH1, SLOTS1, _scaled(base, 1.2)),
-		Level.new("act1_l3", "The Flooded Vault", PATH1, SLOTS1,
-			_append(_scaled(base, 1.4), MAGE, 1, 2.0, 6.0)),
-		Level.new("act1_l4", "The Reliquary", PATH1, SLOTS1,
-			_append(_append(_append(_scaled(base, 1.6), MAGE, 2, 2.0, 6.0), KNIGHT, 1, 3.0, 4.0),
-				NECRO, 1, 1.0, 9.0)),
-		Level.new("act1_l5", "The Master's Gate", PATH1, SLOTS1,
-			_append(_append(_append(_scaled(base, 1.8), MAGE, 2, 2.0, 6.0), KNIGHT, 2, 3.0, 4.0),
-				NECRO, 1, 1.0, 9.0)),
-		Level.new("act1_boss", "The Master", PATH1, SLOTS1,
-			_append(_append(_append(_scaled(base, 2.0), MAGE, 3, 2.0, 6.0), KNIGHT, 2, 3.0, 4.0),
-				NECRO, 1, 1.0, 9.0), true),
-	]
-	_attach_story()
-
-
-## Wires each level's dialogue beats from STORY (M3 slice 2). Keeps writing in one place.
-func _attach_story() -> void:
-	for lvl in act1:
-		var beats: Dictionary = STORY.get(lvl.id, {})
-		lvl.intro = beats.get("intro", [])
-		lvl.outro = beats.get("outro", [])
-
-
-## The number of Act I levels (maps + boss).
-func act1_count() -> int:
-	return act1.size()
-
-
-## Level at `index`, or null if out of range.
-func act1_level(index: int) -> Level:
-	return act1[index] if index >= 0 and index < act1.size() else null
-
-
-## Index of the next uncleared Act I level (for the Hub's "Continue"); clamps to the last level
-## once everything is cleared.
-func act1_next_index() -> int:
-	for i in act1.size():
-		if not MetaState.is_level_cleared(act1[i].id):
-			return i
-	return act1.size() - 1
-
-
-## True if the level at `index` is playable: the first level, or the previous one is cleared.
-func is_act1_unlocked(index: int) -> bool:
-	if index <= 0:
-		return true
-	if index >= act1.size():
-		return false
-	return MetaState.is_level_cleared(act1[index - 1].id)
-
-
-# --- placeholder wave content (Level 1 is real; the rest scale until slice 6/7) ---
-
-## Level 1's real wave schedule (the original prototype's five waves).
-func _base_waves() -> Array:
-	return [
-		[ {"script": GRUNT, "count": 5, "interval": 0.9, "delay": 0.0} ],
-		[ {"script": DOG, "count": 5, "interval": 0.6, "delay": 0.0} ],
-		[ {"script": GRUNT, "count": 6, "interval": 0.8, "delay": 0.0},
-		  {"script": DOG, "count": 3, "interval": 0.7, "delay": 3.0} ],
-		[ {"script": DOG, "count": 7, "interval": 0.45, "delay": 0.0},
-		  {"script": GRUNT, "count": 5, "interval": 0.9, "delay": 1.5},
-		  {"script": WRAITH, "count": 2, "interval": 1.5, "delay": 5.0} ],
-		[ {"script": GRUNT, "count": 10, "interval": 0.6, "delay": 0.0},
-		  {"script": DOG, "count": 8, "interval": 0.4, "delay": 2.0},
-		  {"script": WRAITH, "count": 4, "interval": 1.2, "delay": 4.0} ],
-	]
-
-
-## Appends one enemy group to the final wave (introduces new roster into Act I; placeholder —
-## slice 6 finalizes per-map wave comps). `waves` is fresh (from `_scaled`), so mutating is safe.
-func _append(waves: Array, script: Script, count: int, interval: float, delay: float) -> Array:
-	if waves.is_empty():
-		return waves
-	var last: Array = (waves[waves.size() - 1] as Array).duplicate()
-	last.append({"script": script, "count": count, "interval": interval, "delay": delay})
-	waves[waves.size() - 1] = last
-	return waves
-
-
-## A copy of `base` with every group's count scaled by `mult` (placeholder escalation).
-func _scaled(base: Array, mult: float) -> Array:
-	var out: Array = []
-	for wave in base:
-		var groups: Array = []
-		for g in wave:
-			groups.append({
-				"script": g["script"],
-				"count": int(ceil(g["count"] * mult)),
-				"interval": g["interval"],
-				"delay": g["delay"],
-			})
-		out.append(groups)
-	return out

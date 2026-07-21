@@ -96,6 +96,15 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 6 (the five crypt maps)** — replaced the placeholder single-path/scaled-wave
+  levels with **five distinct hand-authored maps**, each its own path, build slots and wave
+  composition: **The Crypt Approach** (zigzag), **The Ossuary** (big Z), **The Flooded Vault**
+  (inward spiral), **The Reliquary** (top-entry wind), **The Master's Gate** (comb), and the boss
+  **gauntlet** (border → central arena). The roster is introduced gradually so each map teaches a
+  counter — grunts/dogs (L1–2) → **Skeleton Mage** (L3) → **Armored Knight** + first **Wraiths**
+  (L4) → **Raised Necromancer** + full roster (L5) → pre-boss gauntlet. Wraith/Knight waves land
+  once the player has had a chance to farm the sigil for Bound Wraith / the Golem (GDD §10). Wave
+  sizes are a first pass (tuned in slice 8); the Master boss enemy arrives in slice 7.
 - **M3 · Act I, slice 5 (Raised Necromancer miniboss)** — an Act I **miniboss** (GDD §6): elite and
   slow, it periodically **raises a fresh skeleton into the wave** (a green raise-pulse ripples from
   the ground) — so unless you burst it down the wave never ends ("kill it fast or drown"),
