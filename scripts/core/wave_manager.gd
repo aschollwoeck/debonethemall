@@ -110,8 +110,17 @@ func _spawn(enemy_script: Script) -> void:
 	enemy.target_phylactery = _phylactery   # ranged casters (mage, boss) attack it directly (M3)
 	enemy.died.connect(_on_enemy_died)
 	enemy.reached_end.connect(_on_enemy_leaked)
+	enemy.reinforcement_requested.connect(_on_reinforcement)   # necromancer raises reinforcements (M3)
 	_alive += 1
 	enemy_count_changed.emit(_alive)
+
+
+## A summoner (Raised Necromancer) raises a fresh enemy into the current wave. Only while the wave
+## is active — no raising after it ends / the run is over. Spawned + tracked like any wave enemy,
+## so `_alive` stays accurate and the wave won't clear until the reinforcements are dealt with.
+func _on_reinforcement(enemy_script: Script) -> void:
+	if _active and enemy_script != null:
+		_spawn(enemy_script)
 
 
 func _on_enemy_died(reward: int, bones: int) -> void:

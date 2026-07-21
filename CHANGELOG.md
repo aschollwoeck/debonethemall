@@ -96,6 +96,15 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 5 (Raised Necromancer miniboss)** — an Act I **miniboss** (GDD §6): elite and
+  slow, it periodically **raises a fresh skeleton into the wave** (a green raise-pulse ripples from
+  the ground) — so unless you burst it down the wave never ends ("kill it fast or drown"),
+  pressuring low single-target DPS. BONE armor (the Golem's Blunt is the fast answer). Fine pixel
+  art (crowned robed summoner with raised glowing hands → cracked, guttering husk). Enemies gained a
+  `reinforcement_requested` signal; the WaveManager spawns and **tracks** raised reinforcements (only
+  while a wave is active), so the wave can't clear until they're dealt with. Seeded into Act I's
+  later waves (placeholder until slice 6). **Completes the Act I enemy roster.** Tests for the
+  miniboss stats, the raise cadence, and the WaveManager's active-only reinforcement spawning.
 - **M3 · Act I, slice 4 (Armored Knight)** — a tanky enemy (GDD §6) with a **mechanical debone**:
   its **plate shatters off** at the first HP threshold — armor **HEAVY → BONE** and its **speed
   jumps** (a slow tank becomes a fast exposed skeleton) — then it collapses to a bone pile. HEAVY
