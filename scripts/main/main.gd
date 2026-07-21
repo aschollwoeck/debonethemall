@@ -6,6 +6,7 @@ extends Node2D
 
 const HUB_SCENE := "res://scenes/hub/hub.tscn"
 const DIALOGUE_CARD := preload("res://scripts/ui/dialogue_card.gd")
+const ACT_CLEAR_BONUS := 200   # flat Grave Bones for the first Act I clear (on top of the harvest)
 
 ## Minion id → scene script + short display name. Which are *available* in a run is decided by
 ## the meta skill tree (RunModifiers.unlocked_minions); cost is read from the instance (_ready).
@@ -255,19 +256,24 @@ func _finish_run(cleared: bool) -> void:
 		return
 	_game_over = true
 	_waves.stop()   # no more spawns behind the end panel
+	var act_complete := cleared and _level.is_boss
+	var first_act_clear := act_complete and not MetaState.is_level_cleared(_level.id)
 	if cleared:
 		MetaState.mark_level_cleared(_level.id)   # unlocks the next Act I level (M3)
 	var banked := MetaState.bank_harvest(_waves.total_harvest(), cleared)
+	if first_act_clear:
+		MetaState.add_grave_bones(ACT_CLEAR_BONUS)   # one-time act-finale reward
+		banked += ACT_CLEAR_BONUS
 	MetaState.save_game()
 	# On a clear, the level's closing dialogue plays before the end screen (M3 slice 2).
 	if cleared and not _level.outro.is_empty():
-		_play_dialogue(_level.outro, _show_end_panel.bind(cleared, banked))
+		_play_dialogue(_level.outro, _show_end_panel.bind(cleared, banked, act_complete))
 	else:
-		_show_end_panel(cleared, banked)
+		_show_end_panel(cleared, banked, act_complete)
 
 
-func _show_end_panel(cleared: bool, banked: int) -> void:
-	_hud.show_end(cleared, banked)
+func _show_end_panel(cleared: bool, banked: int, act_complete: bool = false) -> void:
+	_hud.show_end(cleared, banked, act_complete)
 
 
 ## Plays a dialogue-card sequence over the run; `on_finished` (optional) fires after the last beat.
@@ -305,3 +311,4 @@ func _selected_affordable() -> bool:
 	if not _minion_cost.has(_selected_kind):
 		return false
 	return GameState.can_afford(_minion_cost[_selected_kind])
+

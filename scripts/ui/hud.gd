@@ -296,9 +296,15 @@ func hide_upgrades() -> void:
 			child.queue_free()
 
 
-func show_end(won: bool, banked_bones: int) -> void:
-	var headline := "The holy land kneels.\nYou win!" if won else "Your phylactery shatters...\nfor now."
-	var bonus := "  (clear bonus!)" if won else ""
+func show_end(won: bool, banked_bones: int, act_complete: bool = false) -> void:
+	var headline: String
+	if act_complete:
+		headline = "ACT I COMPLETE\nThe Master is bones. The crypt is yours."
+	elif won:
+		headline = "The gate holds.\nCrypt cleared."
+	else:
+		headline = "Your phylactery shatters...\nfor now."
+	var bonus := "  (act bonus!)" if act_complete else ("  (clear bonus!)" if won else "")
 	_end_label.text = "%s\n\nHarvested %d Grave Bones%s" % [headline, banked_bones, bonus]
 	_end_panel.visible = true
 	_start_btn.disabled = true

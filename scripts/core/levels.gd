@@ -95,6 +95,14 @@ func act1_next_index() -> int:
 	return act1.size() - 1
 
 
+## True once every Act I level (maps + boss) is cleared.
+func act1_complete() -> bool:
+	for lvl in act1:
+		if not MetaState.is_level_cleared(lvl.id):
+			return false
+	return true
+
+
 ## True if the level at `index` is playable: the first level, or the previous one is cleared.
 func is_act1_unlocked(index: int) -> bool:
 	if index <= 0:
