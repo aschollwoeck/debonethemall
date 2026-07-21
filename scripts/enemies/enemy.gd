@@ -10,6 +10,9 @@ class_name Enemy
 
 signal died(reward: int, bones: int)
 signal reached_end(damage: int)
+## Emitted by summoner enemies (Raised Necromancer, M3) to raise a fresh enemy into the wave; the
+## WaveManager spawns and tracks it so the wave can't clear while raised reinforcements live.
+signal reinforcement_requested(enemy_script: Script)
 
 @export var max_hp: float = 30.0
 @export var armor_type: CombatTypes.Armor = CombatTypes.Armor.BONE

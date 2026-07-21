@@ -11,6 +11,7 @@ const DOG := preload("res://scripts/enemies/skeletal_dog.gd")
 const WRAITH := preload("res://scripts/enemies/wraith.gd")
 const MAGE := preload("res://scripts/enemies/skeleton_mage.gd")
 const KNIGHT := preload("res://scripts/enemies/armored_knight.gd")
+const NECRO := preload("res://scripts/enemies/raised_necromancer.gd")
 
 # --- Level 1 geometry (the original prototype map) ---
 # (PATH1 is a `var`, not `const`: a PackedVector2Array literal isn't a constant expression.)
@@ -92,11 +93,14 @@ func _ready() -> void:
 		Level.new("act1_l3", "The Flooded Vault", PATH1, SLOTS1,
 			_append(_scaled(base, 1.4), MAGE, 1, 2.0, 6.0)),
 		Level.new("act1_l4", "The Reliquary", PATH1, SLOTS1,
-			_append(_append(_scaled(base, 1.6), MAGE, 2, 2.0, 6.0), KNIGHT, 1, 3.0, 4.0)),
+			_append(_append(_append(_scaled(base, 1.6), MAGE, 2, 2.0, 6.0), KNIGHT, 1, 3.0, 4.0),
+				NECRO, 1, 1.0, 9.0)),
 		Level.new("act1_l5", "The Master's Gate", PATH1, SLOTS1,
-			_append(_append(_scaled(base, 1.8), MAGE, 2, 2.0, 6.0), KNIGHT, 2, 3.0, 4.0)),
+			_append(_append(_append(_scaled(base, 1.8), MAGE, 2, 2.0, 6.0), KNIGHT, 2, 3.0, 4.0),
+				NECRO, 1, 1.0, 9.0)),
 		Level.new("act1_boss", "The Master", PATH1, SLOTS1,
-			_append(_append(_scaled(base, 2.0), MAGE, 3, 2.0, 6.0), KNIGHT, 2, 3.0, 4.0), true),
+			_append(_append(_append(_scaled(base, 2.0), MAGE, 3, 2.0, 6.0), KNIGHT, 2, 3.0, 4.0),
+				NECRO, 1, 1.0, 9.0), true),
 	]
 	_attach_story()
 
