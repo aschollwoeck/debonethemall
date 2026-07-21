@@ -356,10 +356,11 @@ cross-arc combos and the ratios, during the balance pass.
 - **✅ M2 — Visual Overhaul — DONE (superseded):** brought the crazy-dark aesthetic in-engine
   (layered backdrop, lighting, shaded units, diegetic HUD) — but in a single low-res big-pixel
   look that playtesting rejected. **Spec: [`M2-visual-overhaul.md`](./M2-visual-overhaul.md).**
-- **▶ M2b — Art Restyle (NEXT):** rebuild the rendering to **finer-pixel units on smooth painted
-  backgrounds, a clean vector UI, and a necromantic-sigil skill tree**. Design carries; rendering
-  approach changes. **Spec: [`M2b-restyle.md`](./M2b-restyle.md) · Art bible: [`art-direction.md`](./art-direction.md).**
-- **M3 — Act I content:** full Act I maps, enemy roster, story delivery, the slave framing —
+- **✅ M2b — Art Restyle — DONE:** rebuilt the rendering to **finer-pixel units on smooth painted
+  backgrounds, a clean vector UI, and a necromantic-sigil skill tree** (mixed resolution). Design
+  carried; only the rendering approach changed. **Spec: [`M2b-restyle.md`](./M2b-restyle.md) · Art
+  bible: [`art-direction.md`](./art-direction.md).**
+- **▶ M3 — Act I content (NEXT):** full Act I maps, enemy roster, story delivery, the slave framing —
   built in the restyled look from the start.
 - **M4+ — Acts II & III, polish, audio, balance.**
 

@@ -37,32 +37,32 @@ res. No coordinate re-basing was needed.
    (smooth world at native res; 480×270 kept as logical coords, no re-base); the reusable
    **pixel-unit pipeline** `PixelArt` (author pixel art into an `Image` → NEAREST-filtered
    `Sprite2D`). Gameplay/logic unchanged.
-2. **Smooth backdrop** — repaint the graveyard at native res: soft gradient sky + glowing moon,
-   blurred spire silhouettes, misty ground, a smooth-lit road with rune glimmers, painted
+2. **Smooth backdrop** *(done)* — repaint the graveyard at native res: soft gradient sky + glowing
+   moon, blurred spire silhouettes, misty ground, a smooth-lit road with rune glimmers, painted
    gravestones/props (the macabre kit, smooth). Replaces the pixel `Backdrop`.
-3. **Lighting & atmosphere** — re-tune the additive glow + vignette for native res (carries from
-   M2 slice 2; keep the per-act accent hook). Fog/embers/motes smooth.
-4. **Phylactery** — smooth faceted crystal + big glow (per mockup), life-driven green→red + cracks.
-5. **Minions (pixel)** — finer pixel-art Bone Archer / Bone-Mill Golem / Bound Wraith via the new
-   pipeline, on soft plots with cast shadows; keep tier pips + range indicator.
-6. **Enemies (pixel)** — finer pixel-art Skeleton Grunt / Skeletal Dog / Wraith + their debone
-   stages (incl. the skull-pop gag), via the pipeline.
-7. **Vector HUD** — restyle the in-run HUD to the flat vector treatment (thin necrotic hairline,
-   flat panels), smooth. Preserve `hud.gd` public API.
-8. **Sigil skill tree** — rebuild the Hub's tree as the radiating necromantic sigil (central
-   skull-core, vein-branches, node states, connecting veins that light on unlock). Smooth-rendered.
+3. **Lighting & atmosphere** *(done)* — re-tune the additive glow + vignette for native res (carries
+   from M2 slice 2; keep the per-act accent hook). Fog/embers/motes smooth.
+4. **Phylactery** *(done)* — smooth faceted crystal + glow (per mockup), life-driven green→red + cracks.
+5. **Minions (pixel)** *(done)* — finer pixel-art Bone Archer / Bone-Mill Golem / Bound Wraith via
+   the new pipeline, on soft plots with cast shadows; keep tier pips + range indicator.
+6. **Enemies (pixel)** *(done)* — finer pixel-art Skeleton Grunt / Skeletal Dog / Wraith + their
+   debone stages (incl. the skull-pop gag), via the pipeline (white-flash hit feedback).
+7. **Vector HUD** *(done)* — restyle the in-run HUD to the flat vector treatment (thin necrotic
+   hairline, flat panels), smooth. Preserved `hud.gd` public API.
+8. **Sigil skill tree** *(done)* — rebuilt the Hub's tree as the radiating necromantic sigil (central
+   skull-core, vein-branches, rectangular node cards, veins that light on unlock). Smooth-rendered.
 
 ## Explicitly OUT of scope
 - New gameplay, minions, enemies, maps, story, balance (that's M3 / a tuning pass).
 - Commissioned external pixel-art assets — units stay **code-drawn** into images (art-direction §11).
 - Audio.
 
-## Success criteria
-- [ ] Units are crisp fine-pixel art; everything else (bg, phylactery, lighting, UI, sigil) is smooth — no big-pixel blockiness anywhere but the units.
-- [ ] Vector UI + the sigil tree match the mockup's feel; sigil node states read at a glance.
-- [ ] Per-act accent hook still works (green → witchfire purple with one value).
-- [ ] Runs smoothly at native res; full test suite green; no gameplay/logic regression.
-- [ ] Side-by-side, the running game reads like the restyle mockup.
+## Success criteria — met (M2b complete, 2026-07)
+- [x] Units are crisp fine-pixel art; everything else (bg, phylactery, lighting, UI, sigil) is smooth — no big-pixel blockiness anywhere but the units.
+- [x] Vector UI + the sigil tree match the mockup's feel; sigil node states read at a glance.
+- [x] Per-act accent hook still works (green → witchfire purple with one value).
+- [x] Runs smoothly at native res; full test suite green (69); no gameplay/logic regression.
+- [x] Side-by-side, the running game reads like the restyle mockup.
 
 ## Technical notes (Godot)
 - **Resolution/filter:** `project.godot` keeps the 480×270 base as a **logical coordinate space**
@@ -80,5 +80,7 @@ slice, self-reviewed by the agents + a screenshot each. Doc reviewers run when d
 
 ---
 
-*When M2b's criteria are met, the game matches the restyle mockup. Next: M3 (Act I content), built
+**Status: complete (2026-07).** All 8 slices shipped (PRs #16–#25), each screenshot-verified and
+self-reviewed. The game now renders the mixed-resolution look — fine pixel-art units on a smooth
+painted world, a vector HUD, and the necromantic-sigil skill tree. Next: M3 (Act I content), built
 in this style.*
