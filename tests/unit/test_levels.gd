@@ -47,6 +47,26 @@ func test_next_index_clamps_when_all_cleared() -> void:
 	assert_eq(Levels.act1_next_index(), Levels.act1_count() - 1, "clamps to the last when all cleared")
 
 
+func test_act1_complete_only_when_all_cleared() -> void:
+	assert_false(Levels.act1_complete(), "not complete at the start")
+	for lvl in Levels.act1:
+		MetaState.mark_level_cleared(lvl.id)
+	assert_true(Levels.act1_complete(), "complete once every level (incl. the boss) is cleared")
+
+
+func test_every_level_has_valid_wave_data() -> void:
+	# guards all six maps' wave schedules — a bad script/count/interval would crash a run at spawn.
+	for lvl in Levels.act1:
+		assert_gt(lvl.waves.size(), 0, "%s has waves" % lvl.id)
+		for wave in lvl.waves:
+			assert_gt((wave as Array).size(), 0, "%s has a non-empty wave" % lvl.id)
+			for g in wave:
+				assert_true(g["script"] is Script, "%s: group has a valid enemy script" % lvl.id)
+				assert_gt(int(g["count"]), 0, "%s: positive count" % lvl.id)
+				assert_gt(float(g["interval"]), 0.0, "%s: positive interval" % lvl.id)
+				assert_true(float(g["delay"]) >= 0.0, "%s: non-negative delay" % lvl.id)
+
+
 func test_levels_carry_story_beats() -> void:
 	var l1 := Levels.act1_level(0)
 	assert_gt(l1.intro.size(), 0, "level 1 has intro dialogue")

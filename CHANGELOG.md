@@ -96,6 +96,14 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 8 (act completion & integration)** — **completes M3**: beating The Master ends
+  **Act I** with a distinct victory screen ("ACT I COMPLETE — The crypt is yours") and a one-time
+  act-clear reward (a flat Grave Bones bonus on top of the ×1.5 harvest); the Hub reflects the win
+  ("Act I — Complete. The Master is bones; Act II stirs..."). Per-level clears now show a fitting
+  "Crypt cleared" instead of the old Act III placeholder line. Added `Levels.act1_complete()` and a
+  validation test sweeping every map's wave data. A first **difficulty / no-soft-lock pass**: a
+  headless auto-play confirmed every map (incl. the necromancer/boss summon loops) resolves and is
+  winnable with no hang — fine-grained balance remains a playtest task (GDD).
 - **M3 · Act I, slice 7 (The Master — Act I boss)** — the end-of-act setpiece (GDD §6): your cruel
   necromancer, a ~2× crowned necromancer-lord with three **HP-threshold phases** (reusing the
   debone-stage tech): he **summons the dead** throughout, escalates to raising **Armored Knights**

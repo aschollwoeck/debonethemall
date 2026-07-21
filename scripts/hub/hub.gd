@@ -74,7 +74,9 @@ func _build_chrome() -> void:
 	title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
 	title.add_theme_constant_override("outline_size", 3)
 
-	_label("Act I — spend Grave Bones on the sigil, then descend.", 9, DIMV.lerp(BONE, 0.4), Vector2(15, 30))
+	var sub := "Act I — Complete. The Master is bones; Act II stirs..." if Levels.act1_complete() \
+		else "Act I — spend Grave Bones on the sigil, then descend."
+	_label(sub, 9, ACCENT if Levels.act1_complete() else DIMV.lerp(BONE, 0.4), Vector2(15, 30))
 
 	_balance_label = _label("", 12, ACCENT, Vector2(346, 12))
 	_balance_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
