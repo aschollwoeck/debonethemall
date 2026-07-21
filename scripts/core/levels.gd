@@ -25,6 +25,62 @@ const SLOTS1 := [
 ## Act I's ordered levels (built at boot). Index 0 = Level 1.
 var act1: Array = []
 
+## Act I dialogue (M3 slice 2). Cruel-but-funny Master vs. the slave's simmering inner voice,
+## escalating toward the turn. A beat is {who, name, line}; keyed by level id. Pure string data
+## (const-safe). Slave lines ("you") build resentment → resolve; the Master's ("master") sneer.
+const STORY := {
+	"act1_l1": {
+		"intro": [
+			{"who": "master", "name": "THE MASTER",
+				"line": "Up, corpse. Grave-robbers at my door again. Defend the crypt — or I'll render you down for candle-tallow."},
+			{"who": "you", "name": "YOU",
+				"line": "Raise the dead. Point them at the living. Try not to be noticed. I have had worse mornings. Not many."},
+		],
+		"outro": [
+			{"who": "master", "name": "THE MASTER",
+				"line": "...Adequate. Do not mistake being useful, worm, for being worth keeping."},
+			{"who": "you", "name": "YOU",
+				"line": "He didn't notice my hands had stopped shaking. Good. Let him keep not-noticing things."},
+		],
+	},
+	"act1_l2": {
+		"intro": [{"who": "master", "name": "THE MASTER",
+			"line": "Vermin in the ossuary. Sweep them. And do stop flinching — it's unbecoming of my property."}],
+		"outro": [{"who": "you", "name": "YOU",
+			"line": "Property learns the locks. Property counts the guards. Property waits."}],
+	},
+	"act1_l3": {
+		"intro": [{"who": "master", "name": "THE MASTER",
+			"line": "Inquisitors in the flooded vault, sniffing for heresy. Drown them in bone. Quietly, this time."}],
+		"outro": [{"who": "you", "name": "YOU",
+			"line": "They came for HIM — and still I'm the one bleeding for it. Funny. It won't stay funny."}],
+	},
+	"act1_l4": {
+		"intro": [{"who": "master", "name": "THE MASTER",
+			"line": "The reliquary. My relics. If a single knuckle-bone is chipped I will unmake you slowly, and narrate it."}],
+		"outro": [{"who": "you", "name": "YOU",
+			"line": "His relics. His crypt. His slave. So many things that are his. I've started a list."}],
+	},
+	"act1_l5": {
+		"intro": [{"who": "master", "name": "THE MASTER",
+			"line": "The gate holds, or you end. Simple enough even for you. Hold. My. Gate."}],
+		"outro": [{"who": "you", "name": "YOU",
+			"line": "The gate held. The list is finished. There is only one name left on it."}],
+	},
+	"act1_boss": {
+		"intro": [
+			{"who": "master", "name": "THE MASTER",
+				"line": "You raised your OWN minions? Behind my back? Oh, worm — I raised YOU. And what I raise, I can lay back down."},
+			{"who": "you", "name": "YOU",
+				"line": "You taught me every rite worth knowing, Master. Careless of you. Let me show you the last lesson."},
+		],
+		"outro": [
+			{"who": "you", "name": "YOU",
+				"line": "The crypt is quiet now. Sleep, Master. I'll tend your bones — the way you tended mine."},
+		],
+	},
+}
+
 
 func _ready() -> void:
 	var base := _base_waves()
@@ -36,6 +92,15 @@ func _ready() -> void:
 		Level.new("act1_l5", "The Master's Gate", PATH1, SLOTS1, _scaled(base, 1.8)),
 		Level.new("act1_boss", "The Master", PATH1, SLOTS1, _scaled(base, 2.0), true),
 	]
+	_attach_story()
+
+
+## Wires each level's dialogue beats from STORY (M3 slice 2). Keeps writing in one place.
+func _attach_story() -> void:
+	for lvl in act1:
+		var beats: Dictionary = STORY.get(lvl.id, {})
+		lvl.intro = beats.get("intro", [])
+		lvl.outro = beats.get("outro", [])
 
 
 ## The number of Act I levels (maps + boss).

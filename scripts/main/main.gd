@@ -1,9 +1,11 @@
 extends Node2D
 ## Run orchestrator. Builds the world (fixed path, phylactery, build slots), spawns the HUD
 ## and wave manager, handles minion placement/upgrades via clicks, and resolves win/lose.
-## Entered from the Hub via "Begin Run"; returns there via "Return to Crypt".
+## Entered from the Hub's level bar (the chosen Level arrives via RunContext); returns via
+## "Return to Crypt". The level's intro/outro dialogue (M3) plays on entry and on a clear.
 
 const HUB_SCENE := "res://scenes/hub/hub.tscn"
+const DIALOGUE_CARD := preload("res://scripts/ui/dialogue_card.gd")
 
 ## Minion id → scene script + short display name. Which are *available* in a run is decided by
 ## the meta skill tree (RunModifiers.unlocked_minions); cost is read from the instance (_ready).
@@ -90,6 +92,10 @@ func _ready() -> void:
 	_on_harvest_changed(0)
 	_update_wave_hud()
 	queue_redraw()
+
+	# The level's opening dialogue (the Master's orders / your inner voice) — M3 slice 2.
+	if not _level.intro.is_empty():
+		_play_dialogue(_level.intro)
 
 
 ## Offers only the minions the meta tree has unlocked (GDD §7). Reads each minion's cost from
@@ -253,7 +259,24 @@ func _finish_run(cleared: bool) -> void:
 		MetaState.mark_level_cleared(_level.id)   # unlocks the next Act I level (M3)
 	var banked := MetaState.bank_harvest(_waves.total_harvest(), cleared)
 	MetaState.save_game()
+	# On a clear, the level's closing dialogue plays before the end screen (M3 slice 2).
+	if cleared and not _level.outro.is_empty():
+		_play_dialogue(_level.outro, _show_end_panel.bind(cleared, banked))
+	else:
+		_show_end_panel(cleared, banked)
+
+
+func _show_end_panel(cleared: bool, banked: int) -> void:
 	_hud.show_end(cleared, banked)
+
+
+## Plays a dialogue-card sequence over the run; `on_finished` (optional) fires after the last beat.
+func _play_dialogue(beats: Array, on_finished := Callable()) -> void:
+	var card := DIALOGUE_CARD.new()
+	add_child(card)
+	if on_finished.is_valid():
+		card.finished.connect(on_finished)
+	card.play(beats)
 
 
 func _update_wave_hud() -> void:

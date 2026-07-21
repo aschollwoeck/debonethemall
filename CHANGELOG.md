@@ -96,6 +96,13 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 2 (dialogue cards)** — between-level story (docs/M3-act-one.md): a flat
+  vector **`DialogueCard`** overlay plays a sequence of beats — the Master's cruel taunts
+  (bloodmark) vs. your slave's simmering inner voice (necrotic) — dimming the scene and advancing
+  on click / Continue. Each `Level` now carries `intro`/`outro` beats (written in one place in the
+  `Levels` registry, escalating slave→overlord across Act I toward the turn on the boss); the run
+  plays a level's intro on entry and its outro on a clear (before the end screen). Tests for the
+  card sequencing and that levels carry beats.
 - **M3 · Act I, slice 1 (level framework)** — made maps data-driven ahead of Act I content
   (docs/M3-act-one.md). A new **`Level`** holds a map's path / build slots / wave schedule; a
   **`Levels`** registry lists Act I's ordered maps (Level 1 is the real prototype map; Levels 2–5
