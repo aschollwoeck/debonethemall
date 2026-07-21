@@ -8,7 +8,8 @@ extends Enemy
 const GRUNT := preload("res://scripts/enemies/skeleton_grunt.gd")
 const KNIGHT := preload("res://scripts/enemies/armored_knight.gd")
 
-const SUMMON_BASE := 6.0     # phase-0 seconds between summons (shortens per phase)
+const SUMMON_INTERVALS := [6.0, 4.0, 2.8]   # seconds between summons, per phase (tightens)
+const SUMMON_BASE: float = SUMMON_INTERVALS[0]
 const STRIKE_INTERVAL := 2.0 # phase-2 seconds between phylactery strikes
 const STRIKE_DAMAGE := 2
 
@@ -50,11 +51,11 @@ func _physics_process(delta: float) -> void:
 			_strike_cd = STRIKE_INTERVAL
 			target_phylactery.take_damage(STRIKE_DAMAGE)
 			_aura = 1.0
-	queue_redraw()
+	queue_redraw()   # unconditional: the persistent aura animates every frame (sin(_t)) — do NOT gate
 
 
 func _summon_interval() -> float:
-	return [SUMMON_BASE, 4.0, 2.8][stage] if stage < 3 else 2.8
+	return SUMMON_INTERVALS[stage] if stage < SUMMON_INTERVALS.size() else SUMMON_INTERVALS[-1]
 
 
 func _summon_pick() -> Script:
