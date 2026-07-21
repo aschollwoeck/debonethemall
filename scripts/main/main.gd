@@ -267,13 +267,13 @@ func _finish_run(cleared: bool) -> void:
 	MetaState.save_game()
 	# On a clear, the level's closing dialogue plays before the end screen (M3 slice 2).
 	if cleared and not _level.outro.is_empty():
-		_play_dialogue(_level.outro, _show_end_panel.bind(cleared, banked, act_complete))
+		_play_dialogue(_level.outro, _show_end_panel.bind(cleared, banked, act_complete, first_act_clear))
 	else:
-		_show_end_panel(cleared, banked, act_complete)
+		_show_end_panel(cleared, banked, act_complete, first_act_clear)
 
 
-func _show_end_panel(cleared: bool, banked: int, act_complete: bool = false) -> void:
-	_hud.show_end(cleared, banked, act_complete)
+func _show_end_panel(cleared: bool, banked: int, act_complete: bool = false, act_bonus: bool = false) -> void:
+	_hud.show_end(cleared, banked, act_complete, act_bonus)
 
 
 ## Plays a dialogue-card sequence over the run; `on_finished` (optional) fires after the last beat.
@@ -311,4 +311,3 @@ func _selected_affordable() -> bool:
 	if not _minion_cost.has(_selected_kind):
 		return false
 	return GameState.can_afford(_minion_cost[_selected_kind])
-
