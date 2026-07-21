@@ -29,6 +29,14 @@ func test_plate_shatters_to_bone() -> void:
 	assert_eq(k.armor_type, CombatTypes.Armor.BONE, "the exposed skeleton is bone, not heavy")
 
 
+func test_single_hit_crossing_both_thresholds_still_strips() -> void:
+	var k: Enemy = KNIGHT.new()
+	add_child_autofree(k)
+	k.take_damage(k.max_hp * 0.9, CombatTypes.Damage.BLUNT)   # one blow past 0.6 AND 0.25
+	assert_eq(k.stage, 2, "jumps straight to the collapsing stage")
+	assert_eq(k.armor_type, CombatTypes.Armor.BONE, "still strips (hook fires once at stage 2)")
+
+
 func test_stripped_form_sprints() -> void:
 	var k: Enemy = KNIGHT.new()
 	add_child_autofree(k)

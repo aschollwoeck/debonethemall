@@ -1,9 +1,9 @@
 extends Enemy
 ## Armored Knight — HEAVY armor, tanky (GDD §6, M3 slice 4). The mechanical debone: its plate
 ## **shatters off** at the first threshold → it becomes a **fast, exposed skeleton** (armor
-## HEAVY → BONE, speed jumps) → then it collapses to a bone pile. HEAVY resists Pierce and Holy,
-## so crack it with Blunt/Fire; once stripped it's a quick BONE runner the Golem shreds. Reaching
-## the phylactery in plate hurts more (higher leak).
+## HEAVY → BONE, speed jumps) → then it collapses to a bone pile. HEAVY resists Pierce and Holy
+## (×0.5), so hit the plate with unresisted Blunt/Fire; once stripped to BONE the Golem's Blunt then
+## shatters it (×1.5). Reaching the phylactery in plate hurts more (higher leak).
 
 func _ready() -> void:
 	max_hp = 92.0
