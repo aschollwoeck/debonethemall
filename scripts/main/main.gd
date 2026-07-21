@@ -16,19 +16,12 @@ const MINION_REGISTRY := {
 const SLOT_RADIUS := 8.0
 const SLOT_CLICK_RADIUS := 12.0
 
-## Fixed enemy path (spawn off-screen left → phylactery on the right).
-var _path := PackedVector2Array([
-	Vector2(-20, 60), Vector2(100, 60), Vector2(100, 150), Vector2(200, 150),
-	Vector2(200, 60), Vector2(300, 60), Vector2(300, 210), Vector2(440, 210),
-])
-
-## Build slots beside the path. Each entry tracks its position and any placed minion.
-var _slots := [
-	Vector2(60, 110), Vector2(150, 105), Vector2(150, 190), Vector2(240, 110),
-	Vector2(255, 30), Vector2(340, 120), Vector2(255, 165), Vector2(360, 175),
-	Vector2(405, 160),
-]
-var _slot_minions: Array = []   # parallel to _slots; Minion or null
+## The level being played (chosen in the Hub via RunContext; defaults to Act I · Level 1 if the
+## run scene is launched directly). Its path/slots/waves drive the run (M3 level framework).
+var _level: Level
+var _path: PackedVector2Array           ## enemy path (from the level)
+var _slots: Array = []                  ## build slots beside the path (from the level)
+var _slot_minions: Array = []           # parallel to _slots; Minion or null
 
 var _phylactery: Phylactery
 var _waves: WaveManager
@@ -44,6 +37,10 @@ var _minion_cost: Dictionary = {}   # id → cost, for available minions this ru
 
 
 func _ready() -> void:
+	# Resolve the level to play (Hub sets RunContext; default to Act I · Level 1 when launched direct).
+	_level = RunContext.current_level if RunContext.current_level != null else Levels.act1[0]
+	_path = _level.path
+	_slots = _level.slots
 	_slot_minions.resize(_slots.size())
 	_mods = SkillTree.build_run_modifiers()
 	_damage_mult = _mods.minion_damage_mult
@@ -72,7 +69,7 @@ func _ready() -> void:
 
 	_waves = WaveManager.new()
 	add_child(_waves)
-	_waves.setup(_path, self, _phylactery)
+	_waves.setup(_path, self, _phylactery, _level.waves)
 	_waves.wave_started.connect(_on_wave_started)
 	_waves.wave_cleared.connect(_on_wave_cleared)
 	_waves.all_waves_cleared.connect(_on_all_cleared)
@@ -252,6 +249,8 @@ func _finish_run(cleared: bool) -> void:
 		return
 	_game_over = true
 	_waves.stop()   # no more spawns behind the end panel
+	if cleared:
+		MetaState.mark_level_cleared(_level.id)   # unlocks the next Act I level (M3)
 	var banked := MetaState.bank_harvest(_waves.total_harvest(), cleared)
 	MetaState.save_game()
 	_hud.show_end(cleared, banked)
