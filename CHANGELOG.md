@@ -5,6 +5,16 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
 ## [Unreleased]
 
 ### Changed
+- **M2b · Restyle, slice 8 (necromantic-sigil skill tree)** — rebuilt the Hub's skill tree from a
+  column-of-buttons into a custom-drawn **radiating sigil** (art-direction §10): a central glowing
+  skull-core with **vein-branches** radiating to the route nodes along five spokes, framed by
+  concentric sigil rings. Each node is a compact **rectangular card** showing its cost (or a green
+  gem when owned); states read at a glance — **owned** (accent glow), **available** (amber),
+  **locked** (dim behind its gate), **reachable-but-unaffordable** (amber dim) — and a branch's
+  veins **light up** as it's unlocked. Hovering a card shows an info-card (name / status /
+  description); clicking an available card buys it. Purchasing, routing, currency and the
+  `SkillTree` data are unchanged. **Completes the M2b restyle** — the mixed-resolution look (fine
+  pixel units on a smooth painted world, vector UI, sigil tree) is fully in place.
 - **M2b · Restyle, slice 7 (vector HUD)** — restyled the in-run HUD from the carved bone/stone
   diegetic look to a clean **vector** treatment (art-direction §10): flat dark panels with a thin
   **necrotic hairline** border, near-square corners and minimal shadow, high contrast against the
