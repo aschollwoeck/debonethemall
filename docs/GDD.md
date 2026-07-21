@@ -133,15 +133,15 @@ Two tiers of setpiece enemies break up the wave rhythm and test the player's bui
   tech we're already building. Bosses may also **strike the phylactery directly** if they
   reach it, raising the stakes of a leak.
 
-**Boss concepts per act (placeholder — TODO):**
+**Boss concepts per act** (Act I **locked** for M3; II/III still placeholder):
 | Act | Boss | Hook |
 |---|---|---|
-| I | **The Master** (your cruel necromancer) or his crypt guardian | The tutorial villain; you finally turn on him |
+| I | **The Master** (your cruel necromancer) — *locked* | The tutorial villain; you finally turn on him. HP-threshold phases (guard-shed → summon adds → direct phylactery strikes). See [`M3-act-one.md`](./M3-act-one.md). |
 | II | **Rival Necromancer-King** | Fields the strongest rival undead; phase-shifts by summoning waves |
 | III | **Radiant Archon / High Cleric** | Holy setpiece; mass-heals and smites, the final obstacle to conquest |
 
-**TODO:** Confirm boss roster + each boss's phase mechanics. **TODO:** Miniboss cadence
-(how often per act). **TODO:** Do bosses drop unique currency / unlock rewards?
+**TODO:** Confirm Act II/III boss phase mechanics. **Act I miniboss cadence** = the Raised
+Necromancer, mid-wave (M3). **TODO:** Do bosses drop unique currency / unlock rewards?
 
 ---
 
