@@ -96,6 +96,15 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 4 (Armored Knight)** — a tanky enemy (GDD §6) with a **mechanical debone**:
+  its **plate shatters off** at the first HP threshold — armor **HEAVY → BONE** and its **speed
+  jumps** (a slow tank becomes a fast exposed skeleton) — then it collapses to a bone pile. HEAVY
+  resists Pierce and Holy, so crack the plate with the Golem's Blunt (or Fire), then finish the
+  quick runner; reaching the phylactery in plate hurts more (double leak). Fine pixel art per stage
+  (iron knight w/ red visor & shield → lunging bare skeleton shedding shards → bone heap under a
+  dented helm). Introduced into Act I's later waves alongside the mage (placeholder until slice 6).
+  A generic `_append` wave helper replaces the mage-only one. Tests for the armor-strip transition,
+  the Pierce-resist, and the speed jump.
 - **M3 · Act I, slice 3 (Skeleton Mage)** — a new enemy (GDD §6): a **ranged caster** (BONE armor)
   that, instead of marching to leak, **halts once within range of the phylactery and lobs necrotic
   bolts at it** on a cadence — so it threatens from afar and must be killed before it sets up
