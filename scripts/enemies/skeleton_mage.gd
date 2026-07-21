@@ -48,8 +48,9 @@ func _physics_process(delta: float) -> void:
 
 func _draw() -> void:
 	super._draw()
-	# a necrotic flare at the staff tip while charging/casting
-	if _cast_glow > 0.01 and stage < 2:
+	# a necrotic flare at the staff tip while charging/casting (shown at every stage — a lingering
+	# hex; the mage keeps chipping until killed, so the flare tracks that, not the visual stage)
+	if _cast_glow > 0.01:
 		var tip := Vector2(7, -13)
 		for i in 3:
 			var t := i / 3.0
@@ -59,7 +60,6 @@ func _draw() -> void:
 ## Fine pixel art per debone stage: robed caster → engulfed in flame → ash pile.
 func _author_stage(st: int) -> Image:
 	var out := Color("241f19")
-	var lo := Color("8f856a")
 	var mid := Color("c8bd9c")
 	var hi := Color("efe6cd")
 	var robe := Color("2b2340")
@@ -101,8 +101,9 @@ func _author_stage(st: int) -> Image:
 				var half := mini(4 + (y - 18) / 3, 8)
 				PixelArt.hline(img, 15 - half, y, half * 2, ash)
 			# flames licking up the body
-			for fx in [9, 12, 15, 18, 21]:
-				var fh: int = 8 + (int(fx) % 3) * 4
+			for j in 5:
+				var fx := 9 + j * 3
+				var fh := 8 + (j % 3) * 4            # varied flame heights (8/12/16/8/12)
 				PixelArt.vline(img, fx, 28 - fh, fh, ember)
 				PixelArt.vline(img, fx, 28 - fh, fh / 2, flame)
 			PixelArt.rect(img, 11, 4, 8, 6, flame)                    # crown of fire
