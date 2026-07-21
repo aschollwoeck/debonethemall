@@ -28,6 +28,9 @@ const CENTER := Vector2(240, 146)
 const R_INNER := 44.0
 const R_OUTER := 88.0
 const CARD := Vector2(40, 20)   # compact rectangular node
+# Keep the cards non-overlapping if you retune these: a route's inner+outer cards share a
+# near-horizontal spoke at the sides, so require (R_OUTER - R_INNER) > CARD.x * cos(18°) ≈ 38.
+# (Current margin is ~2px; widening CARD.x or shrinking the radial gap will collide them.)
 
 # --- palette (art-direction §3) ---
 const ACCENT := Color(0.39, 0.89, 0.60)   # necrotic — owned / lit veins / core

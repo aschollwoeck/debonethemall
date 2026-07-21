@@ -9,9 +9,9 @@ here. Grounded in the **v2 mockup** (the agreed target):
 > look; playtesting rejected it. The new target (mockup:
 > <https://claude.ai/code/artifact/49367d6d-6c9d-4228-b08b-8248a68a216c>) is **finer-pixel-art
 > units on smooth, painted backgrounds, with a clean vector UI** and a **necromantic-sigil skill
-> tree**. The **Restyle** milestone ([`M2b-restyle.md`](./M2b-restyle.md)) rebuilds the rendering
-> to this. The M2 work below (composition, palette, lighting logic, props, tone) carries; the
-> *rendering approach* is superseded by §0.
+> tree**. The **Restyle** milestone ([`M2b-restyle.md`](./M2b-restyle.md)) **rebuilt the rendering
+> to this (complete, 2026-07).** The M2 work below (composition, palette, lighting logic, props,
+> tone) carries; the *rendering approach* is superseded by §0.
 
 ---
 
@@ -112,7 +112,7 @@ A shared kit, used sparingly so it stays unsettling: **skull pyramids, gibbet ca
 skeletons, heads on pikes, one-eyed ravens, bloodmarks on stone, dead trees, broken fences.**
 Dark humor through set design, not gags.
 
-## 10. HUD & menus — vector, smooth *(restyle target)*
+## 10. HUD & menus — vector, smooth *(implemented, M2b)*
 Smooth (no pixels), clean **vector** treatment — flat dark panels with a **thin necrotic hairline
 border**, minimal texture, high contrast against the pixel units:
 - Resource readouts (Bone Dust, Wave, Harvest) in flat panels, colour-coded values.
