@@ -69,8 +69,8 @@ Everything keeps working as we go: the current map becomes **Act I · Level 1**,
 
 ## Success criteria
 - [ ] Act I plays start→finish: 5 maps in order, dialogue cards between them, ending on the boss.
-- [ ] All 6 enemy types (3 existing + Mage/Knight/Necromancer) + the boss read clearly in the
-      restyled look, each with its signature debone/phase reaction.
+- [ ] All 5 enemy types (grunt/dog/wraith + Mage/Knight), the Raised Necromancer miniboss, and the
+      boss read clearly in the restyled look, each with its signature debone/phase reaction.
 - [ ] Levels/waves are data-driven; adding/reordering a map is data, not code.
 - [ ] Act progress persists (Continue resumes; cleared maps replay for farming); the meta loop
       (Grave Bones → sigil) is fed by Act I.
@@ -84,7 +84,7 @@ Everything keeps working as we go: the current map becomes **Act I · Level 1**,
 - **Enemies:** new enemies extend `Enemy` and author pixel art via `_author_stage()` (M2b pipeline);
   add their armor/damage rows to the counter matrix (`CombatTypes`); mechanical stage effects fire
   in `_on_stage_changed()`.
-- **Story:** a `CanvasLayer` dialogue-card overlay (vector style, §10), fed a list of beats; pauses
+- **Story:** a `CanvasLayer` dialogue-card overlay (vector style — [`art-direction.md`](./art-direction.md) §10 / GDD §11), fed a list of beats; pauses
   the run or shows between scenes. Keep copy in data, not code.
 - **Screenshot-verify** every visual slice; new mechanics get unit tests (progress, resurrect,
   armor-strip stage, boss phase transitions).
