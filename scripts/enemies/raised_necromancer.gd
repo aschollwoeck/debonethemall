@@ -40,7 +40,7 @@ func _physics_process(delta: float) -> void:
 
 func _draw() -> void:
 	super._draw()
-	# a necrotic raise-pulse ripples out from the ground as it summons
+	# a necrotic raise-pulse ripples outward from the ground as it summons
 	if _raise_glow > 0.01:
 		var r := 5.0 + (1.0 - _raise_glow) * 15.0
 		draw_arc(Vector2(0, 8), r, 0.0, TAU, 30, Color(0.4, 0.95, 0.6, 0.6 * _raise_glow), 1.5, true)
@@ -49,7 +49,7 @@ func _draw() -> void:
 ## Fine pixel art per debone stage: crowned robed necromancer with raised summoning hands → a
 ## cracked, guttering husk (one arm fallen).
 func _author_stage(st: int) -> Image:
-	var out := Color("14121c")
+	var ink := Color("14121c")
 	var robe := Color("241d38")
 	var robe_hi := Color("3a3057")
 	var bone := Color("c8bd9c")
@@ -63,7 +63,7 @@ func _author_stage(st: int) -> Image:
 				var half := mini(5 + (y - 20) / 2, 12)
 				PixelArt.hline(img, 19 - half, y, half * 2, robe)
 				PixelArt.px(img, 18 + half, y, robe_hi)          # lit right edge
-			PixelArt.hline(img, 8, 45, 22, out)                  # hem shadow
+			PixelArt.hline(img, 8, 45, 22, ink)                  # hem shadow
 			# raised summoning arms + glowing hands
 			PixelArt.line(img, 14, 22, 7, 14, bone); PixelArt.line(img, 24, 22, 31, 14, bone)
 			PixelArt.rect(img, 5, 12, 3, 3, necro); PixelArt.rect(img, 30, 12, 3, 3, necro)
@@ -76,9 +76,9 @@ func _author_stage(st: int) -> Image:
 			PixelArt.rect(img, 15, 9, 8, 7, bone); PixelArt.hline(img, 15, 9, 8, bone_hi)  # skull
 			for cx in [14, 17, 19, 21, 24]:                      # crown spikes
 				PixelArt.vline(img, cx, 4, 3, bone)
-			PixelArt.rect(img, 16, 11, 2, 2, out); PixelArt.rect(img, 20, 11, 2, 2, out)   # sockets
+			PixelArt.rect(img, 16, 11, 2, 2, ink); PixelArt.rect(img, 20, 11, 2, 2, ink)   # sockets
 			PixelArt.px(img, 16, 11, necro); PixelArt.px(img, 21, 11, necro)               # eye glow
-			PixelArt.hline(img, 16, 15, 6, out)                  # jaw
+			PixelArt.hline(img, 16, 15, 6, ink)                  # jaw
 			return img
 		_:
 			# cracked, guttering husk — torn robe, one arm fallen, green leaking from the cracks
@@ -95,6 +95,6 @@ func _author_stage(st: int) -> Image:
 			PixelArt.rect(img, 14, 9, 8, 7, bone); PixelArt.hline(img, 14, 9, 8, bone_hi)
 			for cx in [13, 16, 20, 23]:
 				PixelArt.vline(img, cx, 7, 3, bone)
-			PixelArt.rect(img, 15, 12, 2, 2, out); PixelArt.rect(img, 19, 12, 2, 2, out)
+			PixelArt.rect(img, 15, 12, 2, 2, ink); PixelArt.rect(img, 19, 12, 2, 2, ink)
 			PixelArt.px(img, 15, 12, necro)
 			return img
