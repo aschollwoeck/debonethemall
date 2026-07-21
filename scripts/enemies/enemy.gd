@@ -30,6 +30,9 @@ const BODY_SCALE := 0.5
 
 var hp: float
 var stage: int = 0
+## The phylactery this enemy marches on (set by the WaveManager on spawn). Melee walkers ignore it
+## and just leak at the path's end; ranged casters (Skeleton Mage, boss) attack it directly (M3).
+var target_phylactery: Phylactery = null
 var _path: PackedVector2Array
 var _target_index: int = 1
 var _hit_flash: float = 0.0

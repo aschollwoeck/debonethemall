@@ -96,6 +96,14 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 3 (Skeleton Mage)** — a new enemy (GDD §6): a **ranged caster** (BONE armor)
+  that, instead of marching to leak, **halts once within range of the phylactery and lobs necrotic
+  bolts at it** on a cadence — so it threatens from afar and must be killed before it sets up
+  (weak to the Golem's Blunt, resists the Archer's Pierce). Fine pixel art with its signature
+  fire-death stages (robed caster with a glowing staff → flailing, engulfed in flame → ash pile),
+  plus a necrotic charge-flare while casting. Enemies now carry a `target_phylactery` reference
+  (set by the WaveManager) for ranged attackers; the mage is introduced into Act I's later waves
+  (placeholder comps until slice 6). Tests for its armor and the halt-and-cast vs. advance mechanic.
 - **M3 · Act I, slice 2 (dialogue cards)** — between-level story (docs/M3-act-one.md): a flat
   vector **`DialogueCard`** overlay plays a sequence of beats — the Master's cruel taunts
   (bloodmark) vs. your slave's simmering inner voice (necrotic) — dimming the scene and advancing

@@ -107,6 +107,7 @@ func _spawn(enemy_script: Script) -> void:
 	var enemy: Enemy = enemy_script.new()
 	_spawn_parent.add_child(enemy)
 	enemy.setup(_path)
+	enemy.target_phylactery = _phylactery   # ranged casters (mage, boss) attack it directly (M3)
 	enemy.died.connect(_on_enemy_died)
 	enemy.reached_end.connect(_on_enemy_leaked)
 	_alive += 1
