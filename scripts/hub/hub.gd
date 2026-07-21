@@ -39,6 +39,7 @@ const DIMV := Color(0.44, 0.42, 0.52)     # locked (violet-grey)
 const BONE := Color(0.93, 0.89, 0.79)
 const VOID := Color(0.045, 0.04, 0.075)
 const HAIR := Color(0.39, 0.89, 0.60, 0.55)
+const HAIR_DIM := Color(0.62, 0.68, 0.78, 0.20)   # faint neutral hairline (locked level chips)
 
 var _balance_label: Label
 var _sigil_nodes: Array = []   # {id, pos, route, tier}
@@ -73,23 +74,49 @@ func _build_chrome() -> void:
 	title.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
 	title.add_theme_constant_override("outline_size", 3)
 
+	_label("Act I — spend Grave Bones on the sigil, then descend.", 9, DIMV.lerp(BONE, 0.4), Vector2(15, 30))
+
 	_balance_label = _label("", 12, ACCENT, Vector2(346, 12))
 	_balance_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
 	_balance_label.add_theme_constant_override("outline_size", 3)
 
-	var begin := Button.new()
-	begin.text = "Begin Run  ›"
-	begin.focus_mode = Control.FOCUS_NONE
-	begin.position = Vector2(186, 246)
-	begin.custom_minimum_size = Vector2(108, 18)
-	begin.add_theme_font_size_override("font_size", 12)
-	begin.add_theme_color_override("font_color", BONE)
-	begin.add_theme_color_override("font_hover_color", Color.WHITE)
-	begin.add_theme_stylebox_override("normal", _flat_box(VOID, HAIR, true))
-	begin.add_theme_stylebox_override("hover", _flat_box(Color(0.09, 0.08, 0.15, 0.95), HAIR, true))
-	begin.add_theme_stylebox_override("pressed", _flat_box(Color(0.09, 0.08, 0.15, 0.95), HAIR, true))
-	begin.pressed.connect(_on_begin_run)
-	add_child(begin)
+	_build_level_bar()
+
+
+## The Act I level chips along the bottom: click a cleared/available crypt to descend into it
+## (M3 level framework). Cleared = accent, next-to-play = amber, locked = dim/disabled.
+func _build_level_bar() -> void:
+	var n := Levels.act1_count()
+	var bw := 40.0
+	var gap := 5.0
+	var x0 := (480.0 - (n * bw + (n - 1) * gap)) / 2.0
+	for i in n:
+		var lvl: Level = Levels.act1_level(i)
+		var cleared := MetaState.is_level_cleared(lvl.id)
+		var unlocked := Levels.is_act1_unlocked(i)
+		var accent := Color(ACCENT.r, ACCENT.g, ACCENT.b, 0.7)
+		var amber := Color(AMBER.r, AMBER.g, AMBER.b, 0.7)
+		var border := accent if cleared else (amber if unlocked else HAIR_DIM)
+		var fg := ACCENT if cleared else (AMBER if unlocked else DIMV)
+		var b := Button.new()
+		b.text = "B" if lvl.is_boss else str(i + 1)
+		b.tooltip_text = "%s%s" % [lvl.name, "  ✓" if cleared else ("" if unlocked else "  (locked)")]
+		b.focus_mode = Control.FOCUS_NONE
+		b.position = Vector2(x0 + i * (bw + gap), 246)
+		b.custom_minimum_size = Vector2(bw, 20)
+		b.add_theme_font_size_override("font_size", 11)
+		b.add_theme_color_override("font_color", fg)
+		b.add_theme_color_override("font_hover_color", Color.WHITE)
+		b.add_theme_color_override("font_disabled_color", Color(DIMV.r, DIMV.g, DIMV.b, 0.7))
+		b.add_theme_stylebox_override("normal", _flat_box(VOID, border, cleared))
+		b.add_theme_stylebox_override("hover", _flat_box(Color(0.09, 0.08, 0.15, 0.95), border, true))
+		b.add_theme_stylebox_override("pressed", _flat_box(Color(0.09, 0.08, 0.15, 0.95), border, true))
+		b.add_theme_stylebox_override("disabled", _flat_box(Color(0.04, 0.035, 0.07, 0.85), HAIR_DIM, false))
+		if unlocked:
+			b.pressed.connect(_enter_level.bind(i))
+		else:
+			b.disabled = true
+		add_child(b)
 
 
 func _label(text: String, size: int, color: Color, pos: Vector2) -> Label:
@@ -322,7 +349,13 @@ func _on_buy(id: String) -> void:
 		_refresh()
 
 
-func _on_begin_run() -> void:
+## Descends into Act I level `index` (if it's unlocked): hands the level to the run scene.
+func _enter_level(index: int) -> void:
+	var lvl := Levels.act1_level(index)
+	if lvl == null or not Levels.is_act1_unlocked(index):
+		return
+	RunContext.select(lvl, index)
 	get_tree().change_scene_to_file(RUN_SCENE)
+
 
 

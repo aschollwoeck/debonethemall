@@ -21,6 +21,8 @@ CombatTypes="*res://scripts/combat/combat_types.gd"
 GameState="*res://scripts/core/game_state.gd"
 MetaState="*res://scripts/core/meta_state.gd"
 SkillTree="*res://scripts/meta/skill_tree.gd"
+Levels="*res://scripts/core/levels.gd"
+RunContext="*res://scripts/core/run_context.gd"
 
 [display]
 

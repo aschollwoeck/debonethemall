@@ -96,6 +96,15 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 1 (level framework)** — made maps data-driven ahead of Act I content
+  (docs/M3-act-one.md). A new **`Level`** holds a map's path / build slots / wave schedule; a
+  **`Levels`** registry lists Act I's ordered maps (Level 1 is the real prototype map; Levels 2–5
+  and the boss are placeholders — same path, escalating waves — filled in later slices). `main.gd`
+  and `WaveManager` now **consume a level** (via a `RunContext` hand-off) instead of hardcoding it.
+  **`MetaState`** tracks cleared levels (persisted); the Hub replaces "Begin Run" with an **Act I
+  level bar** — cleared (accent) / next-to-play (amber) / locked (dim) chips you click to descend,
+  clearing one unlocks the next and cleared maps stay replayable for farming. Tests for the
+  registry, unlock gating, and progress save/load.
 - **M1 · Branching upgrades & difficulty pass** — each minion now upgrades along one of two
   branches (Archer: Volley/Piercer · Golem: Wider Grind/Bone Crusher · Wraith: Reaper/Warden),
   chosen via a HUD popup; a second tier deepens the branch. Minion attacks flow through

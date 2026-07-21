@@ -24,6 +24,9 @@ var grave_bones: int = 0:
 ## Unlocked skill-tree node ids. Dictionary used as a set: id (String) -> true.
 var _unlocked: Dictionary = {}
 
+## Cleared level ids (Act I progression, M3). Dictionary used as a set: level id (String) -> true.
+var _cleared_levels: Dictionary = {}
+
 
 func _ready() -> void:
 	load_game()
@@ -76,6 +79,23 @@ func unlocked_ids() -> Array:
 	return _unlocked.keys()
 
 
+# ---------------------------------------------------------------- level progress (M3)
+
+## True if the level with this id has been cleared at least once.
+func is_level_cleared(level_id: String) -> bool:
+	return _cleared_levels.has(level_id)
+
+
+## Records a level as cleared (idempotent). Called on a run clear (main._finish_run).
+func mark_level_cleared(level_id: String) -> void:
+	_cleared_levels[level_id] = true
+
+
+## All cleared level ids.
+func cleared_level_ids() -> Array:
+	return _cleared_levels.keys()
+
+
 # ---------------------------------------------------------------- persistence
 
 ## Serializes persistent state to a plain Dictionary (the save-format contract).
@@ -84,6 +104,7 @@ func to_dict() -> Dictionary:
 		"version": SAVE_VERSION,
 		"grave_bones": grave_bones,
 		"unlocked": _unlocked.keys(),
+		"cleared_levels": _cleared_levels.keys(),
 	}
 
 
@@ -98,6 +119,11 @@ func from_dict(data: Dictionary) -> void:
 	if unlocked is Array:
 		for node_id in unlocked:
 			_unlocked[str(node_id)] = true
+	_cleared_levels.clear()
+	var cleared: Variant = data.get("cleared_levels", [])
+	if cleared is Array:
+		for level_id in cleared:
+			_cleared_levels[str(level_id)] = true
 
 
 ## Saves to the real save file (`SAVE_PATH`).
@@ -144,3 +170,4 @@ func load_from(path: String) -> void:
 func reset_all() -> void:
 	grave_bones = 0
 	_unlocked.clear()
+	_cleared_levels.clear()

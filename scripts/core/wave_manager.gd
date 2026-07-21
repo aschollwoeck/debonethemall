@@ -10,25 +10,10 @@ signal all_waves_cleared
 signal enemy_count_changed(alive: int)
 signal harvest_changed(total: int)
 
-const GRUNT := preload("res://scripts/enemies/skeleton_grunt.gd")
-const DOG := preload("res://scripts/enemies/skeletal_dog.gd")
-const WRAITH := preload("res://scripts/enemies/wraith.gd")
-
-## Each wave is a list of groups: {script, count, interval, delay}.
-## Grunts want Blunt, dogs want Pierce, wraiths want Necrotic — no single minion answers all.
-## (Final difficulty tuning is the M1-F6 balance pass.)
-var _waves := [
-	[ {"script": GRUNT, "count": 5, "interval": 0.9, "delay": 0.0} ],
-	[ {"script": DOG, "count": 5, "interval": 0.6, "delay": 0.0} ],
-	[ {"script": GRUNT, "count": 6, "interval": 0.8, "delay": 0.0},
-	  {"script": DOG, "count": 3, "interval": 0.7, "delay": 3.0} ],
-	[ {"script": DOG, "count": 7, "interval": 0.45, "delay": 0.0},
-	  {"script": GRUNT, "count": 5, "interval": 0.9, "delay": 1.5},
-	  {"script": WRAITH, "count": 2, "interval": 1.5, "delay": 5.0} ],
-	[ {"script": GRUNT, "count": 10, "interval": 0.6, "delay": 0.0},
-	  {"script": DOG, "count": 8, "interval": 0.4, "delay": 2.0},
-	  {"script": WRAITH, "count": 4, "interval": 1.2, "delay": 4.0} ],
-]
+## The wave schedule, injected per level (M3). Each wave is a list of groups
+## {script, count, interval, delay}; the schedule is data-driven from `Level.waves` (see
+## `scripts/core/levels.gd`), so difficulty/roster is content, not code.
+var _waves: Array = []
 
 var _path: PackedVector2Array
 var _spawn_parent: Node
@@ -43,10 +28,12 @@ var _alive: int = 0
 var _harvest: int = 0          # Grave Bones harvested from kills this run
 
 
-func setup(path_points: PackedVector2Array, spawn_parent: Node, phylactery: Phylactery) -> void:
+func setup(path_points: PackedVector2Array, spawn_parent: Node, phylactery: Phylactery,
+		waves: Array) -> void:
 	_path = path_points
 	_spawn_parent = spawn_parent
 	_phylactery = phylactery
+	_waves = waves
 
 
 ## Total Grave Bones harvested from kills so far this run.

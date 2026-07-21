@@ -131,3 +131,30 @@ func test_from_dict_defaults_are_safe() -> void:
 
 func test_to_dict_includes_version() -> void:
 	assert_eq(MetaState.to_dict().get("version"), MetaState.SAVE_VERSION)
+
+
+# ---- level progress (M3) ----
+
+func test_mark_and_query_cleared_level() -> void:
+	assert_false(MetaState.is_level_cleared("act1_l1"))
+	MetaState.mark_level_cleared("act1_l1")
+	MetaState.mark_level_cleared("act1_l1")   # idempotent
+	assert_true(MetaState.is_level_cleared("act1_l1"))
+	assert_eq(MetaState.cleared_level_ids().size(), 1)
+
+
+func test_cleared_levels_survive_save_load() -> void:
+	MetaState.mark_level_cleared("act1_l1")
+	MetaState.mark_level_cleared("act1_l2")
+	MetaState.save_to(TEST_SAVE)
+	MetaState.reset_all()
+	assert_false(MetaState.is_level_cleared("act1_l1"), "reset clears progress")
+	MetaState.load_from(TEST_SAVE)
+	assert_true(MetaState.is_level_cleared("act1_l1"), "cleared levels restored from save")
+	assert_true(MetaState.is_level_cleared("act1_l2"))
+
+
+func test_reset_all_clears_level_progress() -> void:
+	MetaState.mark_level_cleared("act1_l1")
+	MetaState.reset_all()
+	assert_eq(MetaState.cleared_level_ids().size(), 0)
