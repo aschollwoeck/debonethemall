@@ -18,10 +18,10 @@ var PATH1 := PackedVector2Array([
 	Vector2(-20, 60), Vector2(100, 60), Vector2(100, 150), Vector2(200, 150),
 	Vector2(200, 60), Vector2(300, 60), Vector2(300, 210), Vector2(440, 210)])
 var PATH2 := PackedVector2Array([
-	Vector2(-20, 60), Vector2(380, 60), Vector2(380, 150), Vector2(90, 150),
-	Vector2(90, 230), Vector2(460, 230)])
+	Vector2(-20, 60), Vector2(400, 60), Vector2(400, 150), Vector2(90, 150),
+	Vector2(90, 200), Vector2(430, 200)])
 var PATH3 := PackedVector2Array([
-	Vector2(-20, 40), Vector2(440, 40), Vector2(440, 225), Vector2(60, 225),
+	Vector2(-20, 50), Vector2(440, 50), Vector2(440, 225), Vector2(60, 225),
 	Vector2(60, 115), Vector2(345, 115), Vector2(345, 170), Vector2(185, 170)])
 var PATH4 := PackedVector2Array([
 	Vector2(240, -20), Vector2(240, 70), Vector2(60, 70), Vector2(60, 170),
@@ -30,7 +30,7 @@ var PATH5 := PackedVector2Array([
 	Vector2(-20, 225), Vector2(110, 225), Vector2(110, 60), Vector2(230, 60),
 	Vector2(230, 190), Vector2(350, 190), Vector2(350, 60), Vector2(460, 60)])
 var PATH_BOSS := PackedVector2Array([
-	Vector2(-20, 40), Vector2(440, 40), Vector2(440, 230), Vector2(40, 230),
+	Vector2(-20, 50), Vector2(440, 50), Vector2(440, 220), Vector2(40, 220),
 	Vector2(40, 135), Vector2(240, 135)])
 
 const SLOTS1 := [
@@ -38,7 +38,7 @@ const SLOTS1 := [
 	Vector2(255, 30), Vector2(340, 120), Vector2(255, 165), Vector2(360, 175), Vector2(405, 160)]
 const SLOTS2 := [
 	Vector2(60, 95), Vector2(160, 95), Vector2(260, 95), Vector2(340, 100),
-	Vector2(150, 120), Vector2(300, 120), Vector2(150, 190), Vector2(300, 190), Vector2(410, 200)]
+	Vector2(150, 120), Vector2(300, 120), Vector2(150, 180), Vector2(300, 180), Vector2(405, 175)]
 const SLOTS3 := [
 	Vector2(120, 75), Vector2(240, 75), Vector2(360, 75), Vector2(400, 150),
 	Vector2(120, 150), Vector2(250, 145), Vector2(120, 195), Vector2(260, 200), Vector2(405, 195)]
@@ -46,8 +46,8 @@ const SLOTS4 := [
 	Vector2(120, 40), Vector2(160, 110), Vector2(280, 110), Vector2(380, 120),
 	Vector2(120, 200), Vector2(240, 200), Vector2(360, 200), Vector2(200, 120), Vector2(340, 60)]
 const SLOTS5 := [
-	Vector2(55, 130), Vector2(165, 120), Vector2(165, 220), Vector2(290, 120),
-	Vector2(290, 220), Vector2(415, 120), Vector2(80, 90), Vector2(200, 90), Vector2(320, 90)]
+	Vector2(55, 130), Vector2(165, 120), Vector2(165, 210), Vector2(290, 120),
+	Vector2(290, 210), Vector2(415, 120), Vector2(80, 90), Vector2(200, 90), Vector2(320, 90)]
 const SLOTS_BOSS := [
 	Vector2(110, 75), Vector2(230, 75), Vector2(350, 75), Vector2(400, 180),
 	Vector2(120, 180), Vector2(240, 180), Vector2(150, 110), Vector2(330, 110), Vector2(240, 100)]
