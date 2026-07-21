@@ -107,6 +107,8 @@ func _input(event: InputEvent) -> void:
 
 ## Advances to the next beat, or finishes after the last. (Public for tests.)
 func _advance() -> void:
+	if _i >= _beats.size():
+		return   # already finished — ignore stray same-frame input (no double `finished`/free)
 	_i += 1
 	if _i >= _beats.size():
 		_finish()

@@ -26,6 +26,16 @@ func test_advances_through_beats_then_finishes() -> void:
 	assert_signal_emitted(card, "finished", "finishes after the last beat")
 
 
+func test_advance_after_finish_does_not_re_emit() -> void:
+	var card = DialogueCardScript.new()
+	add_child_autofree(card)
+	watch_signals(card)
+	card.play(_beats(1))
+	card._advance()   # finishes (single beat)
+	card._advance()   # stray same-frame input — must be a no-op
+	assert_signal_emit_count(card, "finished", 1, "finished fires exactly once")
+
+
 func test_empty_beats_finishes_immediately() -> void:
 	var card = DialogueCardScript.new()
 	add_child_autofree(card)
