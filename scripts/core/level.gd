@@ -13,6 +13,9 @@ var path: PackedVector2Array      ## enemy path (spawn → phylactery)
 var slots: Array                  ## Array[Vector2] — build slots beside the path
 var waves: Array                  ## wave schedule (see class docstring)
 var is_boss: bool = false         ## an act-boss setpiece (M3 slice 7)
+var intro: Array = []             ## dialogue beats shown on entering the level (M3 slice 2)
+var outro: Array = []             ## dialogue beats shown on clearing the level
+## A beat is {who: "master"|"you", name: String, line: String}.
 
 
 func _init(p_id: String, p_name: String, p_path: PackedVector2Array, p_slots: Array,

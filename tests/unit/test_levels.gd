@@ -45,3 +45,14 @@ func test_next_index_clamps_when_all_cleared() -> void:
 	for lvl in Levels.act1:
 		MetaState.mark_level_cleared(lvl.id)
 	assert_eq(Levels.act1_next_index(), Levels.act1_count() - 1, "clamps to the last when all cleared")
+
+
+func test_levels_carry_story_beats() -> void:
+	var l1 := Levels.act1_level(0)
+	assert_gt(l1.intro.size(), 0, "level 1 has intro dialogue")
+	assert_gt(l1.outro.size(), 0, "level 1 has outro dialogue")
+	var beat: Dictionary = l1.intro[0]
+	assert_true(beat.has("who") and beat.has("line"), "a beat carries who + line")
+	var boss := Levels.act1_level(Levels.act1_count() - 1)
+	assert_gt(boss.intro.size(), 0, "the boss has intro dialogue")
+	assert_gt(boss.outro.size(), 0, "the boss has outro dialogue (the story turn)")
