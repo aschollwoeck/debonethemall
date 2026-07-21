@@ -9,6 +9,7 @@ extends Node
 const GRUNT := preload("res://scripts/enemies/skeleton_grunt.gd")
 const DOG := preload("res://scripts/enemies/skeletal_dog.gd")
 const WRAITH := preload("res://scripts/enemies/wraith.gd")
+const MAGE := preload("res://scripts/enemies/skeleton_mage.gd")
 
 # --- Level 1 geometry (the original prototype map) ---
 # (PATH1 is a `var`, not `const`: a PackedVector2Array literal isn't a constant expression.)
@@ -87,10 +88,10 @@ func _ready() -> void:
 	act1 = [
 		Level.new("act1_l1", "The Crypt Approach", PATH1, SLOTS1, base),
 		Level.new("act1_l2", "The Ossuary", PATH1, SLOTS1, _scaled(base, 1.2)),
-		Level.new("act1_l3", "The Flooded Vault", PATH1, SLOTS1, _scaled(base, 1.4)),
-		Level.new("act1_l4", "The Reliquary", PATH1, SLOTS1, _scaled(base, 1.6)),
-		Level.new("act1_l5", "The Master's Gate", PATH1, SLOTS1, _scaled(base, 1.8)),
-		Level.new("act1_boss", "The Master", PATH1, SLOTS1, _scaled(base, 2.0), true),
+		Level.new("act1_l3", "The Flooded Vault", PATH1, SLOTS1, _plus_mages(_scaled(base, 1.4), 1)),
+		Level.new("act1_l4", "The Reliquary", PATH1, SLOTS1, _plus_mages(_scaled(base, 1.6), 2)),
+		Level.new("act1_l5", "The Master's Gate", PATH1, SLOTS1, _plus_mages(_scaled(base, 1.8), 2)),
+		Level.new("act1_boss", "The Master", PATH1, SLOTS1, _plus_mages(_scaled(base, 2.0), 3), true),
 	]
 	_attach_story()
 
@@ -147,6 +148,17 @@ func _base_waves() -> Array:
 		  {"script": DOG, "count": 8, "interval": 0.4, "delay": 2.0},
 		  {"script": WRAITH, "count": 4, "interval": 1.2, "delay": 4.0} ],
 	]
+
+
+## Appends a small Skeleton Mage group to the final wave (introduces the caster; placeholder —
+## slice 6 finalizes per-map wave comps). `waves` is fresh (from `_scaled`), so mutating is safe.
+func _plus_mages(waves: Array, count: int) -> Array:
+	if waves.is_empty():
+		return waves
+	var last: Array = (waves[waves.size() - 1] as Array).duplicate()
+	last.append({"script": MAGE, "count": count, "interval": 2.0, "delay": 6.0})
+	waves[waves.size() - 1] = last
+	return waves
 
 
 ## A copy of `base` with every group's count scaled by `mult` (placeholder escalation).
