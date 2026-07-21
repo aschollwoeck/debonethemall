@@ -46,35 +46,35 @@ M3 makes this **data-driven**:
 
 Everything keeps working as we go: the current map becomes **Act I · Level 1**, driven by data.
 
-## In scope — built in slices (each its own PR, self-reviewed + screenshot)
-1. **Level framework** — `Level` data + `Levels` registry; refactor `main.gd`/`WaveManager` to
+## In scope — built in slices (each its own PR, self-reviewed + screenshot) — **all done**
+1. **Level framework** *(done)* — `Level` data + `Levels` registry; refactor `main.gd`/`WaveManager` to
    consume a level; `MetaState` Act I progress; Hub level list + Continue/replay routing. Current
    map becomes Level 1. No new content yet — pure enabling refactor, tests for progress logic.
-2. **Story: dialogue cards** — a between-level dialogue-card UI (speaker, line, Continue), a
+2. **Story: dialogue cards** *(done)* — a between-level dialogue-card UI (speaker, line, Continue), a
    data-driven per-level beat list, shown entering a level and on the act's key turns. The Master +
    slave voices; escalation hooks.
-3. **Skeleton Mage** — ranged enemy (lobs at the phylactery / debuffs from afar), fire-death
+3. **Skeleton Mage** *(done)* — ranged enemy (lobs at the phylactery / debuffs from afar), fire-death
    stages (flails → bursts into flames → ash). Fine pixel art; slots into the counter matrix.
-4. **Armored Knight** — tanky; **armor-strip** stage (plate shatters off → speeds up as a fast
+4. **Armored Knight** *(done)* — tanky; **armor-strip** stage (plate shatters off → speeds up as a fast
    grunt → debones). Fine pixel art; mechanical stage change (speed/armor).
-5. **Raised Necromancer (miniboss)** — mid-wave elite that periodically **resurrects** a fallen
+5. **Raised Necromancer (miniboss)** *(done)* — mid-wave elite that periodically **resurrects** a fallen
    enemy on the path; pressures low burst DPS. Fine pixel art; resurrect mechanic + cadence.
-6. **The 5 crypt maps** — 5 distinct paths + escalating wave compositions across the full roster
+6. **The 5 crypt maps** *(done)* — 5 distinct paths + escalating wave compositions across the full roster
    (grunt/dog/wraith/mage/knight + miniboss), themed crypt set-dressing. Introduces enemies
    gradually. (May land as sub-slices 6a–6e.)
-7. **Act I boss — The Master** — a 2–3× setpiece with HP-threshold **phases** (guard-shed → summon
+7. **Act I boss — The Master** *(done)* — a 2–3× setpiece with HP-threshold **phases** (guard-shed → summon
    adds → direct phylactery strikes), his own light source, and the story payoff (you turn on him).
-8. **Act completion & integration** — act-clear flow + reward, story resolution card, currency/loop
+8. **Act completion & integration** *(done)* — act-clear flow + reward, story resolution card, currency/loop
    integration (Grave Bones from the new roster), and a first difficulty pass across the 5 maps.
 
-## Success criteria
-- [ ] Act I plays start→finish: 5 maps in order, dialogue cards between them, ending on the boss.
-- [ ] All 5 enemy types (grunt/dog/wraith + Mage/Knight), the Raised Necromancer miniboss, and the
+## Success criteria — met (M3 complete, 2026-07)
+- [x] Act I plays start→finish: 5 maps in order, dialogue cards between them, ending on the boss.
+- [x] All 5 enemy types (grunt/dog/wraith + Mage/Knight), the Raised Necromancer miniboss, and the
       boss read clearly in the restyled look, each with its signature debone/phase reaction.
-- [ ] Levels/waves are data-driven; adding/reordering a map is data, not code.
-- [ ] Act progress persists (Continue resumes; cleared maps replay for farming); the meta loop
+- [x] Levels/waves are data-driven; adding/reordering a map is data, not code.
+- [x] Act progress persists (Continue resumes; cleared maps replay for farming); the meta loop
       (Grave Bones → sigil) is fed by Act I.
-- [ ] Full test suite green; no regression; every visual screenshot-verified.
+- [x] Full test suite green; no regression; every visual screenshot-verified.
 
 ## Technical notes
 - **Level data:** a `Resource`/`RefCounted` `Level` (or a plain Dictionary registry to start),
@@ -96,5 +96,10 @@ a screenshot each; doc reviewers when docs are touched.
 
 ---
 
-*When M3's criteria are met, Act I is a complete, replayable villain-origin opening. Next: M4 —
-Act II (The Rebellion).*
+**Status: complete (2026-07).** All 8 slices shipped (PRs #28–#35), each screenshot-verified and
+self-reviewed. Act I plays start→finish: five data-driven crypt maps → The Master, an expanded
+roster (Skeleton Mage / Armored Knight / Raised Necromancer miniboss + the boss) each with a
+signature reaction, between-level dialogue escalating slave→overlord, persistent level progress
+with replay-to-farm, and an act-complete flow. A headless auto-play confirmed no soft-locks and
+that every map is winnable; **fine-grained balance is a deferred playtest pass**. Next: M4 — Act II
+(The Rebellion), built on this framework.*

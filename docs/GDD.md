@@ -360,9 +360,14 @@ cross-arc combos and the ratios, during the balance pass.
   backgrounds, a clean vector UI, and a necromantic-sigil skill tree** (mixed resolution). Design
   carried; only the rendering approach changed. **Spec: [`M2b-restyle.md`](./M2b-restyle.md) · Art
   bible: [`art-direction.md`](./art-direction.md).**
-- **▶ M3 — Act I content (NEXT):** full Act I maps, enemy roster, story delivery, the slave framing —
-  built in the restyled look from the start.
-- **M4+ — Acts II & III, polish, audio, balance.**
+- **✅ M3 — Act I content — DONE:** Act I ("The Slave") plays start→finish — a data-driven **level
+  framework**, **five crypt maps → The Master** (boss), an expanded roster (Skeleton Mage, Armored
+  Knight, Raised Necromancer miniboss), **between-level dialogue** escalating slave→overlord,
+  persistent level progress with replay-to-farm, and an act-complete flow. **Spec:
+  [`M3-act-one.md`](./M3-act-one.md).** (Fine balance is a deferred playtest pass.)
+- **▶ M4 — Act II: The Rebellion (NEXT):** break free and turn on the necromancers — rival undead
+  armies, a new currency (Rival Souls), Act II maps + boss. Built on the M3 framework.
+- **M5+ — Act III (The Conquest), polish, audio, balance.**
 
 ---
 
