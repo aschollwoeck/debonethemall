@@ -11,6 +11,7 @@ const WRAITH := preload("res://scripts/enemies/wraith.gd")
 const MAGE := preload("res://scripts/enemies/skeleton_mage.gd")
 const KNIGHT := preload("res://scripts/enemies/armored_knight.gd")
 const NECRO := preload("res://scripts/enemies/raised_necromancer.gd")
+const MASTER := preload("res://scripts/enemies/the_master.gd")
 
 # --- paths (PackedVector2Array literals aren't const-expressions, so `var`) ---
 # spawn off-screen → wind through the crypt → phylactery at the last point.
@@ -167,12 +168,14 @@ func _l5() -> Array:
 	]
 
 
-## Boss map — the pre-boss gauntlet (The Master enemy is added in slice 7).
+## Boss map — a gauntlet, then **The Master** himself (the act-boss setpiece; he summons his own
+## adds, so the final wave is just him).
 func _boss() -> Array:
 	return [
 		[_g(GRUNT, 10, 0.5, 0.0), _g(KNIGHT, 2, 3.0, 3.0)],
 		[_g(DOG, 10, 0.4, 0.0), _g(MAGE, 3, 2.0, 3.0), _g(WRAITH, 2, 2.0, 6.0)],
 		[_g(GRUNT, 12, 0.5, 0.0), _g(KNIGHT, 3, 3.0, 4.0), _g(NECRO, 1, 1.0, 8.0), _g(MAGE, 3, 2.0, 6.0)],
+		[_g(MASTER, 1, 1.0, 2.0)],
 	]
 
 

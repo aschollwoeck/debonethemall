@@ -96,6 +96,15 @@ Human-readable, per milestone. Format loosely follows [Keep a Changelog](https:/
   unchanged. **Completes the M2 visual overhaul** — no placeholder programmer-art remains in a run.
 
 ### Added
+- **M3 · Act I, slice 7 (The Master — Act I boss)** — the end-of-act setpiece (GDD §6): your cruel
+  necromancer, a ~2× crowned necromancer-lord with three **HP-threshold phases** (reusing the
+  debone-stage tech): he **summons the dead** throughout, escalates to raising **Armored Knights**
+  at the second phase, and in his final phase **strikes the phylactery directly** across the field.
+  Carries his own **necrotic aura** (his light source) with a raise/strike pulse. BONE armor; a
+  near-fatal leak if he reaches the phylactery in person. Fine pixel art per phase (commanding lord
+  → enraged, torn, aflame → unravelling husk pouring green). Added as the boss map's final wave
+  (he summons his own adds); clearing him plays the story turn — you break your chains. Tests for
+  the boss stats, the summon cadence, and the final-phase phylactery strike.
 - **M3 · Act I, slice 6 (the five crypt maps)** — replaced the placeholder single-path/scaled-wave
   levels with **five distinct hand-authored maps**, each its own path, build slots and wave
   composition: **The Crypt Approach** (zigzag), **The Ossuary** (big Z), **The Flooded Vault**
